@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId "net.kebernet.configuration.erigo"
-        minSdkVersion 15
+        minSdkVersion 25
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -51,6 +51,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'com.android.support:design:25.3.1'
 
-
-    compile project(":client-framework")
+    compile(project(":client-framework")){
+        exclude  group: 'org.rxtx'
+    }
 }

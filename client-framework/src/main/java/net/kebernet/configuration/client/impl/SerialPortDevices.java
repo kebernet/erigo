@@ -1,8 +1,23 @@
+/*
+ *     Copyright (c) 2017 Robert Cooper
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package net.kebernet.configuration.client.impl;
 
 import com.google.common.annotations.GwtIncompatible;
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.Gson;
 import gnu.io.CommPort;
@@ -13,6 +28,8 @@ import gnu.io.UnsupportedCommOperationException;
 import net.kebernet.configuration.client.model.Device;
 import net.kebernet.configuration.client.service.Devices;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -84,19 +101,19 @@ public class SerialPortDevices implements Devices {
 
 
     @Override
-    public void listenForDevices(DeviceListCallback callback) {
+    public void listenForDevices(@Nonnull DeviceListCallback callback) {
         this.listeners.add(callback);
     }
 
     @Override
-    public void listKnownDevices(DeviceListCallback callback) {
+    public void listKnownDevices(@Nonnull DeviceListCallback callback) {
         DEFAULT_EXECUTOR.submit(()->{
             callback.onDevices(new ArrayList<>(devices.values()));
         });
     }
 
     @Override
-    public void setErrorCallback(ErrorCallback callback) {
+    public void setErrorCallback(@Nullable ErrorCallback callback) {
         this.errorCallback = callback;
     }
 
@@ -133,14 +150,15 @@ public class SerialPortDevices implements Devices {
             this.identifier = identifier;
         }
 
+        @Nonnull
         Optional<Device> query() {
             Device discovered = null;
             try {
                 this.commPort = identifier.open(SerialProtocolHandler.class.getSimpleName(), COMM_PORT_TIMEOUT);
                 SerialPort serialPort = (SerialPort) commPort;
                 serialPort.setSerialPortParams(57600,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-                this.in = new BufferedReader(new InputStreamReader(commPort.getInputStream()));
-                this.out = new PrintWriter(new OutputStreamWriter(commPort.getOutputStream()));
+                this.in = new BufferedReader(new InputStreamReader(commPort.getInputStream(),Charsets.US_ASCII));
+                this.out = new PrintWriter(new OutputStreamWriter(commPort.getOutputStream(), Charsets.US_ASCII));
                 send("Hello");
                 doNext();
             } catch (PortInUseException e) {
@@ -156,7 +174,7 @@ public class SerialPortDevices implements Devices {
             try {
                 discovered = discoveredDevice.get(PROTOCOL_TIMEOUT, TimeUnit.MILLISECONDS);
             } catch (InterruptedException |ExecutionException | TimeoutException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.FINE, "Couldn't get discovered device for "+commPort.getName());
             }
             if(discovered != null) {
                 discovered.setAddress("serial://" + this.commPort.getName());
@@ -204,12 +222,12 @@ public class SerialPortDevices implements Devices {
             }
         }
 
-        private void send(String token){
+        private void send(@Nonnull String token){
             out.println(PROTOCOL_PREFIX+token);
             out.flush();
         }
 
-        private boolean parseDevice(String token) {
+        private boolean parseDevice(@Nonnull String token) {
             try {
                 discoveredDevice.set(new Gson().fromJson(token, Device.class));
                 return true;

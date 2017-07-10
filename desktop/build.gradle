@@ -10,13 +10,10 @@ buildscript {
 import com.badlogicgames.packr.*
 import de.undercouch.gradle.tasks.download.Download
 
-apply plugin: 'java'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "net.ltgt.apt"
 apply plugin: 'de.undercouch.download'
 apply plugin: 'application'
-
-sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
