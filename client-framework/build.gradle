@@ -1,5 +1,6 @@
 configurations {
     j2o
+    j2oCp
 }
 
 Properties local = readProperties(project.rootProject.file('local.properties'))
@@ -10,9 +11,7 @@ dependencies {
     compile group: 'javax.jmdns', name: 'jmdns', version: '3.4.1'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
 
-    compile files(local.getProperty("j2objc.home")+'/lib/j2objc_annotations.jar')
-    // RXTX should be installed in the JRE
-    compile group: 'org.rxtx', name: 'rxtx', version: '2.1.7'
+    j2oCp files(local.getProperty("j2objc.home")+'/lib/j2objc_annotations.jar')
 
     // Sources dependencies for things that need to get cross compiled to ObjC
     j2o group: 'javax.jmdns', name: 'jmdns', version: '3.4.1', classifier: 'sources'
@@ -22,11 +21,13 @@ dependencies {
     testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.3.9.v20160517'
 }
 
-
-
 //
 //  J2Objc Stuff
 //
+
+sourceSets.main.compileClasspath += configurations.j2oCp
+sourceSets.test.compileClasspath += configurations.j2oCp
+sourceSets.test.runtimeClasspath += configurations.j2oCp
 
 Properties readProperties(File f){
     Properties p = new Properties()

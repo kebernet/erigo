@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.client.impl;
+package net.kebernet.configuration.desktop;
 
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.base.Charsets;

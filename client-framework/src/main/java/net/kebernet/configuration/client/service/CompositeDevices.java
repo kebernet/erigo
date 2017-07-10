@@ -50,6 +50,7 @@ public class CompositeDevices implements Devices {
         listeners.add(callback);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void listKnownDevices(DeviceListCallback callback) {
         final List[] results = new List[internal.length];
@@ -64,7 +65,7 @@ public class CompositeDevices implements Devices {
                 }
                 ArrayList<Device> total = new ArrayList<>();
                 for(List l : results){
-                    total.addAll(l);
+                    total.addAll((List<Device>) l);
                 }
                 callback.onDevices(total);
                 return false;

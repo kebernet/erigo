@@ -20,7 +20,6 @@ import dagger.Provides;
 import net.kebernet.configuration.client.app.DeviceListPresenter;
 import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.impl.MulticastDNSDevices;
-import net.kebernet.configuration.client.impl.SerialPortDevices;
 import net.kebernet.configuration.client.service.CompositeDevices;
 import net.kebernet.configuration.client.service.Devices;
 
