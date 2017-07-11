@@ -48,4 +48,9 @@ public class MockServer {
         jmDNS.registerService(serviceInfo);
 
     }
+
+    public static void main(String... args) throws Exception {
+        MockServer s = new MockServer();
+        s.server.join();
+    }
 }

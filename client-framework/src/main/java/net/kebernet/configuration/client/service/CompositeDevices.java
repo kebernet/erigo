@@ -18,8 +18,12 @@ package net.kebernet.configuration.client.service;
 import net.kebernet.configuration.client.model.Device;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -27,6 +31,7 @@ import java.util.logging.Logger;
  */
 public class CompositeDevices implements Devices {
     private static final Logger LOGGER = Logger.getLogger(CompositeDevices.class.getCanonicalName());
+    private static final ExecutorService defaultExecutor = Executors.newWorkStealingPool();
     private final Devices[] internal;
     private final CopyOnWriteArrayList<DeviceListCallback> listeners = new CopyOnWriteArrayList<>();
 
@@ -82,10 +87,17 @@ public class CompositeDevices implements Devices {
 
     @Override
     public void refresh() {
-        for(Devices d: internal){
-            LOGGER.info("Starting refresh on "+d.getClass().getCanonicalName());
-            d.refresh();
-        }
-        LOGGER.info("Refresh done.");
+        defaultExecutor.submit(()->{
+            Arrays.stream(internal)
+                    .forEach(d ->{
+                        LOGGER.info("Starting refresh on "+d.getClass().getCanonicalName());
+                        try {
+                            d.refresh();
+                        } catch(Exception e){
+                            LOGGER.log(Level.WARNING, null, e);
+                        }
+                    });
+        });
+        LOGGER.info("Refresh started.");
     }
 }

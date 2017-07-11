@@ -117,7 +117,8 @@ public class MulticastDNSDevices implements Devices {
             jmdns.addServiceListener(MDNS_SERVICE_TYPE, this.serviceListener = new ServiceListener() {
                 @Override
                 public void serviceAdded(ServiceEvent event) {
-                    LOGGER.info("Service added: "+event.getName());
+                    LOGGER.info("Service added: "+event.getName() +" "+event.getInfo());
+                    jmdns.requestServiceInfo(event.getType(), event.getName());
                 }
 
                 @Override

@@ -17,17 +17,23 @@ package net.kebernet.configuration.desktop;
 
 import dagger.Module;
 import dagger.Provides;
+import net.kebernet.configuration.client.app.AppFlow;
 import net.kebernet.configuration.client.app.DeviceListPresenter;
 import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.impl.MulticastDNSDevices;
 import net.kebernet.configuration.client.service.CompositeDevices;
 import net.kebernet.configuration.client.service.Devices;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * Created by rcooper on 7/7/17.
  */
 @Module(
-        injects = DeviceListPresenter.class
+        injects = {
+                AppFlowImpl.class
+        }
 )
 public class DefaultModule {
 
@@ -38,7 +44,9 @@ public class DefaultModule {
     }
 
     @Provides
+    @Singleton
     public DeviceListView listView(){
         return new DeviceListViewImpl();
     }
+
 }

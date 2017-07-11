@@ -44,7 +44,7 @@ sourceSets.test.compileClasspath += configurations.provided
 sourceSets.test.runtimeClasspath += configurations.provided
 
 mainClassName = "net.kebernet.configuration.desktop.Erigo"
-applicationDefaultJvmArgs = ["-Xmx2s56m"]
+applicationDefaultJvmArgs = ["-Xmx256m"]
 
 distributions {
     main {

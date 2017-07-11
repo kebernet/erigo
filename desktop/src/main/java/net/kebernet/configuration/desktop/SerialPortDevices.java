@@ -70,24 +70,28 @@ public class SerialPortDevices implements Devices {
 
     @Override
     public synchronized void refresh(){
-        Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
-        ArrayList<CommPortIdentifier> serialPorts = new ArrayList<>();
-        while(portEnum.hasMoreElements()){
-            CommPortIdentifier cpi = portEnum.nextElement();
-            if(cpi.getPortType() == CommPortIdentifier.PORT_SERIAL){
-                serialPorts.add(cpi);
+        try {
+            Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
+            ArrayList<CommPortIdentifier> serialPorts = new ArrayList<>();
+            while (portEnum.hasMoreElements()) {
+                CommPortIdentifier cpi = portEnum.nextElement();
+                if (cpi.getPortType() == CommPortIdentifier.PORT_SERIAL) {
+                    serialPorts.add(cpi);
+                }
             }
+            List<Device> deviceList = serialPorts.parallelStream()
+                    .map(SerialProtocolHandler::new)
+                    .map(SerialProtocolHandler::query)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            LOGGER.info("Got local device list");
+            deviceList.forEach(d -> devices.put(d.getName(), d));
+            LOGGER.info("Notify: " + deviceList);
+            notifyDevices(deviceList);
+        } catch(Exception e){
+            LOGGER.log(Level.WARNING, "Exception getting serial devices", e);
         }
-        List<Device> deviceList = serialPorts.parallelStream()
-                .map(SerialProtocolHandler::new)
-                .map(SerialProtocolHandler::query)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-        LOGGER.info("Got local device list");
-        deviceList.forEach(d->devices.put(d.getName(), d));
-        LOGGER.info("Notify: "+deviceList);
-        notifyDevices(deviceList);
     }
 
     private void notifyDevices(List<Device> deviceList) {

@@ -52,24 +52,24 @@ public class ImageView extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return img == null ? new Dimension(200, 200) : new Dimension(img.getWidth(), img.getHeight());
+        return img == null ? new Dimension(100, 100) : new Dimension(img.getWidth(), img.getHeight());
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
-        LinearGradientPaint lgp = new LinearGradientPaint(
-                new Point(0, 0),
-                new Point(0, getHeight()),
-                new float[]{0f, 1f},
-                new Color[]{Color.GREEN, Color.YELLOW});
-        g2d.setPaint(lgp);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
         if (img != null) {
-            int x = (getWidth() - img.getWidth()) / 2;
-            int y = (getHeight() - img.getHeight()) / 2;
-            g2d.drawImage(img, x, y, this);
+            if(img.getHeight() > img.getWidth()) {
+                Image rendered = img.getScaledInstance(-1, getHeight(), Image.SCALE_SMOOTH);
+                int x = getWidth() / 2 - rendered.getWidth(null) / 2;
+                g2d.drawImage(rendered, x, 0, this);
+            } else {
+                Image rendered = img.getScaledInstance(-1, getHeight(), Image.SCALE_SMOOTH);
+                int y = getHeight() / 2 - rendered.getHeight(null) / 2;
+                g2d.drawImage(img.getScaledInstance(getWidth(), -1, Image.SCALE_SMOOTH), 0, y, this);
+            }
+
         }
         g2d.dispose();
     }

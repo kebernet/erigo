@@ -19,11 +19,13 @@ import net.kebernet.configuration.client.model.Device;
 import net.kebernet.configuration.client.service.Devices;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.LinkedHashSet;
 
 /**
  * Created by rcooper on 7/3/17.
  */
+@Singleton
 public class DeviceListPresenter implements DeviceListView.RefreshCallback, DeviceListView.DeviceSelectionCallback {
 
     private final DeviceListView view;
