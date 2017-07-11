@@ -16,9 +16,6 @@
 package net.kebernet.configuration.desktop;
 
 import dagger.ObjectGraph;
-import net.kebernet.configuration.client.app.AppFlow;
-import net.kebernet.configuration.client.app.DeviceListPresenter;
-import net.kebernet.configuration.client.app.DeviceListView;
 
 import javax.swing.*;
 import java.util.logging.Logger;

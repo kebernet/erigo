@@ -61,8 +61,8 @@ public class DeviceListItem {
             imageHolder.add(imageView);
         } catch (Exception e) {
             e.printStackTrace();
-            ;
         }
+        root.setMaximumSize(new Dimension(Integer.MAX_VALUE, 105));
     }
 
     {

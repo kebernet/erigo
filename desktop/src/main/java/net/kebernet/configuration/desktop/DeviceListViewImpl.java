@@ -25,6 +25,10 @@ import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.model.Device;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -43,9 +47,16 @@ public class DeviceListViewImpl implements DeviceListView {
     private JButton refreshButton;
     private JScrollPane scrollPane;
     private Set<Device> devices = Collections.synchronizedSet(new LinkedHashSet<Device>());
+    private RefreshCallback refreshCallback;
+    private DeviceSelectionCallback deviceSelected;
 
     public DeviceListViewImpl() {
         devicePanel.setLayout(new BoxLayout(devicePanel, BoxLayout.Y_AXIS));
+        refreshButton.addActionListener((e)-> {
+            if (refreshCallback != null) {
+                refreshCallback.onRefreshClicked();
+            }
+        });
     }
 
     @Override
@@ -69,7 +80,28 @@ public class DeviceListViewImpl implements DeviceListView {
     private void render() {
         devicePanel.removeAll();
         for (Device d : devices) {
-            devicePanel.add(new DeviceListItem(d).root);
+            DeviceListItem item = new DeviceListItem(d);
+            Color bg = item.root.getBackground();
+
+            item.root.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if(deviceSelected != null){
+                        deviceSelected.onDeviceSelected(d);
+                    }
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    item.root.setBackground(Color.DARK_GRAY);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    item.root.setBackground(bg);
+                }
+            });
+            devicePanel.add(item.root);
         }
         devicePanel.revalidate();
         devicePanel.repaint();
@@ -77,12 +109,12 @@ public class DeviceListViewImpl implements DeviceListView {
 
     @Override
     public void setDeviceSelectionCallback(DeviceSelectionCallback callback) {
-
+        this.deviceSelected = callback;
     }
 
     @Override
     public void setRefreshClicked(RefreshCallback callback) {
-
+        this.refreshCallback = callback;
     }
 
     public static void main(String[] args) {

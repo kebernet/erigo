@@ -37,6 +37,7 @@ public class Device {
     private String manufacturer;
     private String thumbnailUrl;
     private String settingsUrl;
+    private String settingsValuesUrl;
 
     public String getAddress() {
         return address;
@@ -86,6 +87,14 @@ public class Device {
         this.settingsUrl = settingsUrl;
     }
 
+    public String getSettingsValuesUrl() {
+        return settingsValuesUrl;
+    }
+
+    public void setSettingsValuesUrl(String settingsValuesUrl) {
+        this.settingsValuesUrl = settingsValuesUrl;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -95,6 +104,7 @@ public class Device {
                 .add("manufacturer", manufacturer)
                 .add("thumbnailUrl", getThumbnailUrl())
                 .add("settingsUrl", getSettingsUrl())
+                .add("settingsValuesUrl", getSettingsValuesUrl())
                 .toString();
     }
 
@@ -108,7 +118,8 @@ public class Device {
                 Objects.equal(type, device.type) &&
                 Objects.equal(manufacturer, device.manufacturer) &&
                 Objects.equal(thumbnailUrl, device.thumbnailUrl) &&
-                Objects.equal(settingsUrl, device.settingsUrl);
+                Objects.equal(settingsUrl, device.settingsUrl) &&
+                Objects.equal(settingsValuesUrl, device.settingsValuesUrl);
     }
 
     @Override

@@ -34,14 +34,14 @@ public interface Devices {
     /**
      * Lists the currently discovered devices.
      * This will always happen asyncronously.
-     * @param callback
+     * @param callback Callback for current known devices
      */
     void listKnownDevices(DeviceListCallback callback);
 
     /**
      * Sets an error callback. This will provide messages that can be presented to the user
      * when an error occurs inside the Devices service.
-     * @param callback
+     * @param callback ErrorCallback
      */
     void setErrorCallback(ErrorCallback callback);
 
