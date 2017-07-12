@@ -18,6 +18,7 @@ package net.kebernet.configuration.desktop;
 import net.kebernet.configuration.client.app.AppFlow;
 import net.kebernet.configuration.client.app.DeviceListPresenter;
 import net.kebernet.configuration.client.app.DeviceListView;
+import net.kebernet.configuration.client.app.DeviceSettingsPresenter;
 import net.kebernet.configuration.client.model.Device;
 
 import javax.inject.Inject;
@@ -30,14 +31,14 @@ import javax.swing.*;
 @Singleton
 public class AppFlowImpl implements AppFlow {
 
-    private final DeviceListViewImpl deviceListViewImpl;
     private final JFrame frame;
-    private final DeviceListPresenter presenter;
+    private final DeviceListPresenter deviceListPresenter;
+    private final DeviceSettingsPresenter deviceSettingsPresenter;
 
     @Inject
-    public AppFlowImpl(DeviceListView deviceListView, DeviceListPresenter presenter){
-        this.deviceListViewImpl = (DeviceListViewImpl) deviceListView;
-        this.presenter = presenter;
+    public AppFlowImpl(DeviceListPresenter deviceListPresenter, DeviceSettingsPresenter deviceSettingsPresenter){
+        this.deviceListPresenter = deviceListPresenter;
+        this.deviceSettingsPresenter = deviceSettingsPresenter;
         this.frame = new JFrame("Erigo");
         SwingUtilities.invokeLater(() -> {
             try {
@@ -55,14 +56,24 @@ public class AppFlowImpl implements AppFlow {
     @Override
     public void showDeviceList() {
         SwingUtilities.invokeLater(()->{
-            frame.setContentPane(deviceListViewImpl.root);
-            presenter.bind();
+            deviceSettingsPresenter.unBind();
+            frame.setContentPane(
+                    ((DeviceListViewImpl) deviceListPresenter.getView()).root);
+            deviceListPresenter.bind(this);
         });
 
     }
 
     @Override
     public void showDevice(Device device) {
-
+        SwingUtilities.invokeLater(()->{
+            deviceListPresenter.unbind();
+            frame.setContentPane(
+                    ((SettingsView) deviceSettingsPresenter.getView()).root
+            );
+            frame.revalidate();
+            frame.repaint();
+            deviceSettingsPresenter.bind(this, device);
+        });
     }
 }

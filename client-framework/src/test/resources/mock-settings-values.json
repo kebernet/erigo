@@ -13,27 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-{
-  "description" : "This is the thing. It is a very nice thing.\nWe will make it happen with the thing.",
-  "groups":[
-    {
-      "index": 0,
-      "name": "Wifi settings",
-      "description" : "Connect your doo dad to the network.",
-      "settings" : [
-        {
-          "name": "wifi_ssid",
-          "description" : "WiFi Network Name",
-          "type": "text",
-          "validationExpression" : ".*"
-        },
-        {
-          "name": "wifi_password",
-          "description" : "WiFi password",
-          "type": "text",
-          "validationExpression" : ".*"
-        }
-      ]
-    }
-  ]
-}
+[
+  { "name": "name", "value": "value"}
+]

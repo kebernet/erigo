@@ -15,7 +15,7 @@
  */
 package net.kebernet.configuration.client.service;
 
-import net.kebernet.configuration.client.model.Settings;
+import net.kebernet.configuration.client.model.SettingsValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +45,19 @@ public class CompositeDeviceSettings implements DeviceSettings {
     }
 
     @Override
-    public void saveSettings(String settingsAddress, Settings settings, SaveCallback callback) {
-
+    public void listValues(String valuesUrl, ValuesCallback callback) {
+        internal.stream()
+                .filter(s-> s.canResolve(valuesUrl))
+                .findFirst()
+                .ifPresent(s-> s.listValues(valuesUrl, callback));
     }
+
+    @Override
+    public void saveSettings(String valuesAddress, List<SettingsValue> values, SaveCallback callback) {
+        internal.stream()
+                .filter(s-> s.canResolve(valuesAddress))
+                .findFirst()
+                .ifPresent(s-> s.saveSettings(valuesAddress, values, callback));
+    }
+
 }

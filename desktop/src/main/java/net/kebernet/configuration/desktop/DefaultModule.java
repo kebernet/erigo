@@ -17,14 +17,14 @@ package net.kebernet.configuration.desktop;
 
 import dagger.Module;
 import dagger.Provides;
-import net.kebernet.configuration.client.app.AppFlow;
-import net.kebernet.configuration.client.app.DeviceListPresenter;
 import net.kebernet.configuration.client.app.DeviceListView;
+import net.kebernet.configuration.client.app.DeviceSettingsView;
+import net.kebernet.configuration.client.impl.HttpDeviceSettings;
 import net.kebernet.configuration.client.impl.MulticastDNSDevices;
 import net.kebernet.configuration.client.service.CompositeDevices;
+import net.kebernet.configuration.client.service.DeviceSettings;
 import net.kebernet.configuration.client.service.Devices;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
@@ -38,15 +38,27 @@ import javax.inject.Singleton;
 public class DefaultModule {
 
     @Provides
+    @Singleton
     public Devices devices(){
         return new CompositeDevices(new MulticastDNSDevices(), new SerialPortDevices());
+    }
 
+    @Provides
+    @Singleton
+    public DeviceSettings settings(){
+        return new HttpDeviceSettings();
     }
 
     @Provides
     @Singleton
     public DeviceListView listView(){
         return new DeviceListViewImpl();
+    }
+
+    @Provides
+    @Singleton
+    public DeviceSettingsView settingsView(){
+        return new SettingsView(new SettingViewFactory());
     }
 
 }

@@ -52,7 +52,7 @@ public class DeviceListViewImpl implements DeviceListView {
 
     public DeviceListViewImpl() {
         devicePanel.setLayout(new BoxLayout(devicePanel, BoxLayout.Y_AXIS));
-        refreshButton.addActionListener((e)-> {
+        refreshButton.addActionListener((e) -> {
             if (refreshCallback != null) {
                 refreshCallback.onRefreshClicked();
             }
@@ -86,7 +86,7 @@ public class DeviceListViewImpl implements DeviceListView {
             item.root.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if(deviceSelected != null){
+                    if (deviceSelected != null) {
                         deviceSelected.onDeviceSelected(d);
                     }
                 }

@@ -20,9 +20,6 @@ import com.google.common.base.Objects;
 import com.google.j2objc.annotations.ReflectionSupport;
 import net.kebernet.configuration.client.util.URIUtil;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -88,7 +85,7 @@ public class Device {
     }
 
     public String getSettingsValuesUrl() {
-        return settingsValuesUrl;
+        return URIUtil.resolveRelativeURI(this.getAddress(), settingsValuesUrl);
     }
 
     public void setSettingsValuesUrl(String settingsValuesUrl) {

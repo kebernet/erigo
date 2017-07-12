@@ -17,5 +17,6 @@
   "type": "Test Type",
   "manufacturer": "Test Manufacturer",
   "thumbnailUrl": "http://www.kebernet.net/_/rsrc/1264535093579/Home/therespie.jpg",
-  "settingsUrl": "/mock-settings.json"
+  "settingsUrl": "/mock-settings.json",
+  "settingsValuesUrl": "/mock-settings-values.json"
 }

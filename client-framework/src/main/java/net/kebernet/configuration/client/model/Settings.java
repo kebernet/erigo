@@ -15,7 +15,10 @@
  */
 package net.kebernet.configuration.client.model;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.j2objc.annotations.ReflectionSupport;
+import net.kebernet.configuration.client.util.URIUtil;
 
 import java.util.List;
 
@@ -39,7 +42,31 @@ public class Settings {
         return groups;
     }
 
+
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Settings)) return false;
+        Settings settings = (Settings) o;
+        return
+                Objects.equal(description, settings.description) &&
+                Objects.equal(groups, settings.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(description, groups);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("description", description)
+                .add("groups", groups)
+                .toString();
     }
 }

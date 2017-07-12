@@ -31,6 +31,7 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
     private static final Logger LOGGER = Logger.getLogger(DeviceListPresenter.class.getCanonicalName());
     private final DeviceListView view;
     private final Devices service;
+    private AppFlow appFlow;
 
     private final LinkedHashSet<Device> knownDevices = new LinkedHashSet<>();
     private boolean isShutdown;
@@ -42,7 +43,9 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
         this.service = service;
     }
 
-    public void bind() {
+    public void bind(AppFlow flow) {
+        this.appFlow = flow;
+        isShutdown = false;
         view.setDeviceSelectionCallback(this);
         view.setRefreshClicked(this);
         service.listKnownDevices(devices -> {
@@ -65,10 +68,16 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
     @Override
     public void onDeviceSelected(Device device) {
         LOGGER.info("Device selected "+device);
+        appFlow.showDevice(device);
     }
+
 
     @Override
     public void onRefreshClicked() {
+        service.refresh();
+    }
 
+    public DeviceListView getView(){
+        return this.view;
     }
 }

@@ -13,32 +13,32 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.client.service;
+package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Settings;
 import net.kebernet.configuration.client.model.SettingsValue;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
- * Created by rcooper on 7/3/17.
+ * Created by rcooper on 7/11/17.
  */
-public interface DeviceSettings {
+public interface DeviceSettingsView {
 
-    boolean canResolve(String settingsAddress);
-    void listSettings(String settingsAddress, SettingsCallback callback);
-    void listValues(String valuesUrl, ValuesCallback callback);
-    void saveSettings(String valuesAddress, List<SettingsValue> values, SaveCallback callback);
+    void showLoading();
+    void hideLoading();
 
-    interface ValuesCallback {
-        void onValuesResponse(List<SettingsValue> values);
-    }
+    void setDeviceName(String name);
+    void setSettings(Settings settings, Collection<SettingsValue> values);
 
-    interface SettingsCallback {
-        void onSettingsResponse(Settings settings);
+    void setSettingChangedCallback(SettingsChangedCallback callback);
+    void setSaveCallback(SaveCallback callback);
+
+    interface SettingsChangedCallback {
+        void onSettingChanged(String name, String value);
     }
 
     interface SaveCallback {
-        void onSave(boolean success);
+        void onSaveClicked();
     }
 }
