@@ -41,7 +41,7 @@ public class MulticastDNSDevicesTest {
             return true;
         });
         devices.startListening();
-        MockServer server = new MockServer();
+        MockServer server = new MockServer(MockServer.randomPort());
         Device device = deviceFuture.get();
         assertTrue(device != null);
         assertTrue(device.getAddress().startsWith("http://"));
@@ -58,7 +58,6 @@ public class MulticastDNSDevicesTest {
         assertTrue(device != null);
         assertTrue(device.getAddress().startsWith("http://"));
         assertEquals("http://www.kebernet.net/_/rsrc/1264535093579/Home/therespie.jpg", device.getThumbnailUrl());
-        System.out.println(device);
         server.server.stop();
         devices.stopListening();
     }

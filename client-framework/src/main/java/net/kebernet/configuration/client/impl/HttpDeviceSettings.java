@@ -1,6 +1,20 @@
+/*
+ *     Copyright (c) 2017 Robert Cooper
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package net.kebernet.configuration.client.impl;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -8,31 +22,22 @@ import net.kebernet.configuration.client.model.Settings;
 import net.kebernet.configuration.client.model.SettingsValue;
 import net.kebernet.configuration.client.service.DeviceSettings;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by rcooper on 7/12/17.
+ * An implementation of the DeviceSettings repository for HTTP/HTTPS based devices.
  */
 public class HttpDeviceSettings implements DeviceSettings {
     private static final Type VALUES_LIST_TYPE = new TypeToken<List<SettingsValue>>() {
     }.getType();
     private static final Logger LOGGER = Logger.getLogger(HttpDeviceSettings.class.getCanonicalName());
-    private static final ExecutorService DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
     private static final Set<String> SCHEMES = ImmutableSet.of("http", "https");
+    private final HttpClient client = new HttpClient();
 
     @Override
     public boolean canResolve(String settingsAddress) {
@@ -45,38 +50,19 @@ public class HttpDeviceSettings implements DeviceSettings {
 
     @Override
     public void listSettings(String settingsAddress, SettingsCallback callback) {
-        fetchToStream(settingsAddress, (stream)->{
+        client.getToStream(settingsAddress, (stream)->{
             callback.onSettingsResponse(new Gson().fromJson(stream, Settings.class));
         });
     }
 
     @Override
     public void listValues(String valuesUrl, ValuesCallback callback) {
-        fetchToStream(valuesUrl, (stream)->{
+        client.getToStream(valuesUrl, (stream)->{
             callback.onValuesResponse(new Gson().fromJson(stream, VALUES_LIST_TYPE));
         });
     }
 
-    private void fetchToStream(String url, Consumer<InputStreamReader> callback){
-        try {
-            final URL u = new URL(url);
-            DEFAULT_EXECUTOR.submit(() -> {
-                try {
-                    HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-                    if (connection.getResponseCode() != 200) {
-                        throw new IOException("Unexpected response code " + connection.getResponseCode() + " from " + url);
-                    }
-                    callback.accept(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
 
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Failed to fetch " + url, e);
-                }
-            });
-
-        } catch (MalformedURLException e) {
-            LOGGER.log(Level.WARNING, "Failed to parse " + url, e);
-        }
-    }
 
     @Override
     public void saveSettings(String valuesAddress, List<SettingsValue> values, SaveCallback callback) {

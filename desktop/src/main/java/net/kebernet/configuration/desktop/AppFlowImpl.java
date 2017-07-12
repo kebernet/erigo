@@ -60,6 +60,8 @@ public class AppFlowImpl implements AppFlow {
             frame.setContentPane(
                     ((DeviceListViewImpl) deviceListPresenter.getView()).root);
             deviceListPresenter.bind(this);
+            frame.revalidate();
+            frame.repaint();
         });
 
     }
