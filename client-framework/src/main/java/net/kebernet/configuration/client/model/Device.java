@@ -35,6 +35,7 @@ public class Device {
     private String thumbnailUrl;
     private String settingsUrl;
     private String settingsValuesUrl;
+    private String webUiUrl;
 
     public String getAddress() {
         return address;
@@ -92,6 +93,14 @@ public class Device {
         this.settingsValuesUrl = settingsValuesUrl;
     }
 
+    public String getWebUiUrl() {
+        return URIUtil.resolveRelativeURI(this.getAddress(), webUiUrl);
+    }
+
+    public void setWebUiUrl(String webUiUrl) {
+        this.webUiUrl = webUiUrl;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -102,6 +111,7 @@ public class Device {
                 .add("thumbnailUrl", getThumbnailUrl())
                 .add("settingsUrl", getSettingsUrl())
                 .add("settingsValuesUrl", getSettingsValuesUrl())
+                .add("webUiUrl", getWebUiUrl())
                 .toString();
     }
 
@@ -116,7 +126,8 @@ public class Device {
                 Objects.equal(manufacturer, device.manufacturer) &&
                 Objects.equal(thumbnailUrl, device.thumbnailUrl) &&
                 Objects.equal(settingsUrl, device.settingsUrl) &&
-                Objects.equal(settingsValuesUrl, device.settingsValuesUrl);
+                Objects.equal(settingsValuesUrl, device.settingsValuesUrl) &&
+                Objects.equal(webUiUrl, device.webUiUrl);
     }
 
     @Override

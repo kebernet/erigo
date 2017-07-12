@@ -1,4 +1,4 @@
-/**
+/*
  *     Copyright (c) 2017 Robert Cooper
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,27 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-{
-  "description" : "This is the thing. It is a very nice thing.\nWe will make it happen with the thing.",
-  "groups":[
-    {
-      "index": 0,
-      "name": "Wi-Fi Settings",
-      "description" : "Connect your doo \ndad to the network.",
-      "settings" : [
-        {
-          "name": "wifi_ssid",
-          "description" : "Wi-Fi Network Name",
-          "type": "text",
-          "validationExpression" : ".*"
-        },
-        {
-          "name": "wifi_password",
-          "description" : "Wi-Fi Password",
-          "type": "password",
-          "validationExpression" : ".*"
-        }
-      ]
-    }
-  ]
-}
+/**
+ * Implementations of stuff for the app framework. All of these will be implemented using pretty
+ * vanilla Java and should be suitable for multiple runtime environments (desktop, android, ios)
+ */
+package net.kebernet.configuration.client.impl;

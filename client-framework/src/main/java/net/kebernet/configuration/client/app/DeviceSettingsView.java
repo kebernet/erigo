@@ -33,6 +33,7 @@ public interface DeviceSettingsView {
 
     void setSettingChangedCallback(SettingsChangedCallback callback);
     void setSaveCallback(SaveCallback callback);
+    void setCancelCallback(CancelCallback callback);
 
     interface SettingsChangedCallback {
         void onSettingChanged(String name, String value);
@@ -41,4 +42,9 @@ public interface DeviceSettingsView {
     interface SaveCallback {
         void onSaveClicked();
     }
+
+    interface CancelCallback {
+        void onCancelClicked();
+    }
+
 }

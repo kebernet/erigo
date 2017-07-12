@@ -63,7 +63,7 @@ public class GroupView {
     }
 
     private void dispatchValueChange(String name, String value) {
-        if(this.callback != null){
+        if (this.callback != null) {
             this.callback.onSettingChanged(name, value);
         }
     }

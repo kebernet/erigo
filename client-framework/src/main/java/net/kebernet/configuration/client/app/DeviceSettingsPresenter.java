@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by rcooper on 7/11/17.
  */
 @Singleton
-public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback, DeviceSettingsView.SettingsChangedCallback {
+public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback, DeviceSettingsView.SettingsChangedCallback, DeviceSettingsView.CancelCallback {
 
     private final DeviceSettingsView view;
     private final DeviceSettings service;
@@ -49,6 +49,7 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
         this.appFlow = flow;
         view.setDeviceName(device.getName());
         view.setSettingChangedCallback(this);
+        view.setCancelCallback(this);
         view.showLoading();
         service.listSettings(device.getSettingsUrl(), (settings)->{
             this.settings = settings;
@@ -67,6 +68,10 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
     public void unBind(){
         view.setSaveCallback(null);
         view.setSettingChangedCallback(null);
+        view.setCancelCallback(null);
+        this.responseCount.set(0);
+        this.settings = null;
+        this.values = null;
     }
 
     private void render(){
@@ -86,5 +91,10 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
 
     public DeviceSettingsView getView(){
         return this.view;
+    }
+
+    @Override
+    public void onCancelClicked() {
+        appFlow.showDeviceList();
     }
 }
