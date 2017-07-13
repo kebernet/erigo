@@ -17,6 +17,8 @@ package net.kebernet.configuration.client.impl;
 
 import com.google.common.io.CharStreams;
 import com.google.common.util.concurrent.SettableFuture;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,16 +30,32 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.*;
 
 /**
+ * Tests for HttpClient
+ *
  * Created by rcooper on 7/13/17.
  */
 public class HttpClientTest {
+
+    private static int port = MockServer.randomPort();
+    private static MockServer mockServer;
+
+    @BeforeClass
+    public static void setup() throws Exception {
+        mockServer = new MockServer(port);
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        mockServer.stop();
+    }
 
 
     @Test
     public void testSimpleGet() throws Exception {
         HttpClient client = new HttpClient();
-        int port = MockServer.randomPort();
-        MockServer mockServer = new MockServer(port);
+
+
+
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("http://localhost:"+port+"/hello", (reader)->{
             try {
@@ -46,16 +64,13 @@ public class HttpClientTest {
                 throw new RuntimeException(e);
             }
         });
-        String read = result.get(1, TimeUnit.SECONDS);
+        String read = result.get(2, TimeUnit.SECONDS);
         assertEquals("world", read);
-        mockServer.stop();
     }
 
     @Test
     public void testRedirectedGet() throws Exception {
         HttpClient client = new HttpClient();
-        int port = MockServer.randomPort();
-        MockServer mockServer = new MockServer(port);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("http://localhost:"+port+"/helloRedirected", (reader)->{
             try {
@@ -66,14 +81,11 @@ public class HttpClientTest {
         });
         String read = result.get(1, TimeUnit.SECONDS);
         assertEquals("world", read);
-        mockServer.stop();
     }
 
     @Test
     public void testPermanentRedirectedGet() throws Exception {
         HttpClient client = new HttpClient();
-        int port = MockServer.randomPort();
-        MockServer mockServer = new MockServer(port);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
             try {
@@ -93,12 +105,10 @@ public class HttpClientTest {
         });
         read = result.get(1, TimeUnit.SECONDS);
         assertEquals("world", read);
-        mockServer.stop();
     }
 
     @Test
     public void testAuthenticatedGet() throws Exception {
-        int port = MockServer.randomPort();
         String checkUrl = "http://localhost:"+port+"/authenticated";
         AtomicBoolean didAuth = new AtomicBoolean(false);
         HttpClient client = new HttpClient();
@@ -109,7 +119,6 @@ public class HttpClientTest {
             callback.accept(new HttpClient.BasicAuthenticationToken("user", "pass"));
         });
 
-        MockServer mockServer = new MockServer(port);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream(checkUrl, (reader)->{
             try {
@@ -118,10 +127,10 @@ public class HttpClientTest {
                 throw new RuntimeException(e);
             }
         });
-        String read = result.get(1, TimeUnit.SECONDS);
+        String read = result.get(3, TimeUnit.SECONDS);
         assertEquals("authenticated", read);
         assertTrue(didAuth.get());
-        mockServer.stop();
+
     }
 
     @Test(expected = TimeoutException.class)
@@ -135,7 +144,6 @@ public class HttpClientTest {
         client.setErrorCallback(error::set);
         client.setAuthenticationCallback((url, previousToken, callback) -> {
             assertEquals(checkUrl, url);
-            assertNull(previousToken);
             didAuth.set(true);
             callback.accept(new HttpClient.BasicAuthenticationToken("user", "invalid password"));
         });
@@ -157,8 +165,6 @@ public class HttpClientTest {
             assertTrue(didAuth.get());
             assertEquals("Couldn't authenticate with "+checkUrl, error.get());
             throw e;
-        } finally {
-            mockServer.stop();
         }
 
     }

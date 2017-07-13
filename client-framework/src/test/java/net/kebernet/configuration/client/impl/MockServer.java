@@ -16,11 +16,18 @@
 package net.kebernet.configuration.client.impl;
 
 import net.kebernet.configuration.client.util.URIUtil;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -54,7 +61,28 @@ public class MockServer {
 
     public MockServer(int port) throws Exception {
         jmDNS = JmDNS.create(InetAddress.getLocalHost());
-        server = new Server(port);
+        server = new Server();
+
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(port);
+
+        HttpConfiguration https = new HttpConfiguration();
+        https.addCustomizer(new SecureRequestCustomizer());
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath(
+                MockServer.class.getResource("/test-keystore.jks").toExternalForm()
+        );
+        sslContextFactory.setKeyStorePassword("erigotest");
+        sslContextFactory.setKeyManagerPassword("erigotest");
+
+        ServerConnector sslConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                new HttpConnectionFactory(https));
+
+        sslConnector.setPort(port+1);
+
+        server.setConnectors(new Connector[] { connector, sslConnector });
+
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(true);
         resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
@@ -83,7 +111,7 @@ public class MockServer {
     }
 
     public static void main(String... args) throws Exception {
-        MockServer s = new MockServer();
+        MockServer s = new MockServer(14000);
         s.server.join();
     }
 

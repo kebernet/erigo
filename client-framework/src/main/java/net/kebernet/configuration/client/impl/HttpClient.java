@@ -16,12 +16,15 @@
 package net.kebernet.configuration.client.impl;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,26 +39,61 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("WeakerAccess")
 public class HttpClient {
+    public static final String AUTHENTICATION_HEADER = "Authentication";
     private static final ExecutorService DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
     private static final Logger LOGGER = Logger.getLogger(HttpClient.class.getCanonicalName());
-    public static final String AUTHENTICATION_HEADER = "Authentication";
     private static final ConcurrentHashMap<String, String> PERMANENT_REDIRECTS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, AuthenticationToken> TOKEN_MAP = new ConcurrentHashMap<>();
     private AuthenticationCallback authenticationCallback;
     private ErrorCallback errorCallback;
 
+    /**
+     * Parses URI and generates a key for token caching
+     *
+     * @param url URL to parse
+     * @return the String for the TOKEN_MAP.
+     */
+    private static String urlToKey(String url) {
+        try {
+            return uriToKey(new URI(url));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    public void getToStream(String url, Consumer<InputStreamReader> callback){
+    /**
+     * Generates a key for token caching from a URI
+     *
+     * @param uri URI to read.
+     * @return the String for the TOKEN_MAP.
+     */
+    public static String uriToKey(URI uri) {
+        return new StringBuilder(uri.getScheme())
+                .append("::")
+                .append(uri.getHost())
+                .append("::")
+                .append(uri.getPort()).toString();
+    }
+
+    /**
+     * Makes a get request.
+     *
+     * @param url      The URL to hit.
+     * @param callback A callback with the result.
+     */
+    public void getToStream(String url, Consumer<InputStreamReader> callback) {
         getToStream(url, null, callback);
     }
 
-    public void getToStream(String url, AuthenticationToken token, Consumer<InputStreamReader> callback){
+    public void getToStream(String url, AuthenticationToken authenticationToken, Consumer<InputStreamReader> callback) {
         try {
             final URL u = new URL(PERMANENT_REDIRECTS.getOrDefault(url, url));
+            AuthenticationToken token = TOKEN_MAP.getOrDefault(uriToKey(u.toURI()), authenticationToken);
             DEFAULT_EXECUTOR.submit(() -> {
                 try {
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
                     connection.setInstanceFollowRedirects(false);
-                    if(token != null){
+                    if (token != null) {
                         connection.setRequestProperty(AUTHENTICATION_HEADER,
                                 new StringBuilder(token.getScheme())
                                         .append(' ')
@@ -64,19 +102,18 @@ public class HttpClient {
                         );
                     }
                     connection.setUseCaches(false);
-                    switch(connection.getResponseCode()){
-                        case 200: break;
+                    switch (connection.getResponseCode()) {
+                        case 200:
+                            break;
                         case 301:
                             PERMANENT_REDIRECTS.put(url, connection.getHeaderField("Location"));
                         case 302:
                         case 303:
-                            getToStream(connection.getHeaderField("Location"), callback);
+                            getToStream(connection.getHeaderField("Location"), token, callback);
                             return;
                         case 403:
-                            if(this.authenticationCallback != null) {
-                                requestAuthorization(url, token, callback);
-                                return;
-                            }
+                            requestAuthorization(url, token, callback);
+                            return;
                         default:
                             throw new IOException("Unexpected response code " + connection.getResponseCode() + " from " + url);
                     }
@@ -87,49 +124,88 @@ public class HttpClient {
                 }
             });
 
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             LOGGER.log(Level.WARNING, "Failed to parse " + url, e);
             maybeSendError(String.format("Unknown URL: %s", url));
         }
     }
 
-    public void setAuthenticationCallback(AuthenticationCallback callback){
+    /**
+     * Sets the user input auth callback.
+     *
+     * @param callback A callback that will queried for authentication tokens
+     */
+    public void setAuthenticationCallback(AuthenticationCallback callback) {
         this.authenticationCallback = callback;
     }
 
-    public void setErrorCallback(ErrorCallback callback){
+    /**
+     * Sets a callback for user presented errors that might happen.
+     *
+     * @param callback The callback for the message.
+     */
+    public void setErrorCallback(ErrorCallback callback) {
         this.errorCallback = callback;
     }
 
-    private void maybeSendError(String message){
-        if(errorCallback != null){
+    private void maybeSendError(String message) {
+        if (errorCallback != null) {
             errorCallback.onError(message);
         }
     }
 
     private void requestAuthorization(String url, AuthenticationToken token, Consumer<InputStreamReader> callback) throws IOException {
-        if(this.authenticationCallback == null){
+        if (this.authenticationCallback == null) {
             String error = String.format("The following URL requires authentication, but there is no handler: %s", url);
             maybeSendError(error);
             throw new IOException(String.format("The following URL requires authentication, but there is no handler: %s", url));
         }
-        new NoRetryAuthenticationCallback(this.authenticationCallback).authenticationRequired(url, token, authenticationToken -> {
-            if(authenticationToken == null){
+        new NoRetryAuthenticationCallback(this.authenticationCallback).authenticationRequired(url, token, (authenticationToken) -> {
+            if (authenticationToken == null) {
                 throw new RuntimeException("Didn't get authentication token!");
             }
-            this.getToStream(url, authenticationToken, callback);
+            try {
+                TOKEN_MAP.put(urlToKey(url), authenticationToken);
+                this.getToStream(url, authenticationToken, callback);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, null, e);
+            }
         });
     }
 
+    /**
+     * A callback
+     */
     public interface AuthenticationCallback {
         void authenticationRequired(String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback);
     }
 
+    /**
+     * An authentication token based on the token header, a scheme and a value.
+     */
     public interface AuthenticationToken {
+        /**
+         * A scheme, like "Basic" or "Bearer"
+         *
+         * @return The scheme
+         */
         String getScheme();
+
+        /**
+         * A value for the header.
+         *
+         * @return The value to return.
+         */
         String getValue();
     }
 
+    public interface ErrorCallback {
+        void onError(String errorMessage);
+    }
+
+    /**
+     * An authentication token based on username and password.
+     */
     public static class BasicAuthenticationToken implements AuthenticationToken {
         private final String username;
         private final String password;
@@ -141,12 +217,12 @@ public class HttpClient {
 
 
         @Override
-        public String getScheme(){
+        public String getScheme() {
             return "Basic";
         }
 
         @Override
-        public String getValue(){
+        public String getValue() {
             return Base64.getEncoder().encodeToString(
                     new StringBuilder(username)
                             .append(':')
@@ -169,8 +245,19 @@ public class HttpClient {
         public int hashCode() {
             return Objects.hashCode(username, password);
         }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("username", username)
+                    .add("password", password)
+                    .toString();
+        }
     }
 
+    /**
+     * An authentication token based on a bearer token.
+     */
     public static class BearerAuthenticationToken implements AuthenticationToken {
 
         private final String token;
@@ -201,6 +288,13 @@ public class HttpClient {
         public int hashCode() {
             return Objects.hashCode(token);
         }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("token", token)
+                    .toString();
+        }
     }
 
     private class NoRetryAuthenticationCallback implements AuthenticationCallback {
@@ -213,14 +307,13 @@ public class HttpClient {
 
         @Override
         public void authenticationRequired(String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback) {
-            wrapped.authenticationRequired(url, previousToken, (nextToken)->{
-                maybeSendError(String.format("Couldn't authenticate with %s", url));
-                callback.accept(Objects.equal(nextToken, previousToken) ? null : nextToken);
+            wrapped.authenticationRequired(url, previousToken, (nextToken) -> {
+                if (Objects.equal(nextToken, previousToken)) {
+                    maybeSendError(String.format("Couldn't authenticate with %s", url));
+                } else {
+                    callback.accept(nextToken);
+                }
             });
         }
-    }
-
-    public interface ErrorCallback {
-        void onError(String errorMessage);
     }
 }

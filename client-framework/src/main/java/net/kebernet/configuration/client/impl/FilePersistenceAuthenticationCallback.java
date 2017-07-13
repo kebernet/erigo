@@ -50,6 +50,12 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
     private final HttpClient.AuthenticationCallback nestedCallback;
     private final File propertiesFile;
 
+    /**
+     * A new constructor
+     * @param propertiesFile The props file to (maybe) read from
+     * @param nestedCallback the callback to wrap with persistence.
+     * @throws IOException That is a thing that might happen.
+     */
     public FilePersistenceAuthenticationCallback(@Nonnull File propertiesFile, @Nonnull HttpClient.AuthenticationCallback nestedCallback) throws IOException {
         this.nestedCallback = nestedCallback;
         this.propertiesFile = propertiesFile;
@@ -82,6 +88,10 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
         }
     }
 
+    /**
+     * Save the current list of tokens.
+     * @throws IOException A thing that might happen.
+     */
     private void save() throws IOException {
         FilePersistenceAuthenticationCallback.syncExecute(()->{
             try(Writer w = new OutputStreamWriter(new FileOutputStream(this.propertiesFile), Charsets.UTF_8)){
@@ -91,6 +101,11 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
         });
     }
 
+    /**
+     * Read a key from persistent storage.
+     * @param key The key to read
+     * @return an optional that might have a PersistedAuthenticatedToken in it.
+     */
     @Nonnull
     private Optional<PersistedAuthenticationToken> read(@Nonnull String key){
         if(properties.getProperty(key) == null){
@@ -100,11 +115,22 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
         }
     }
 
+    /**
+     * Save a token
+     * @param token The token to save.
+     * @throws IOException Thrown if we couldn't save it.
+     */
     private void persist(@Nonnull PersistedAuthenticationToken token) throws IOException {
         properties.put(token.key, token.toString());
         save();
     }
 
+    /**
+     * Woot. The URL that this whole mofo wraps
+     * @param url The URL to look up.
+     * @param previousToken The previous token the HttpClient tried.
+     * @param callback A callback with the new token.
+     */
     @Override
     public void authenticationRequired(@Nonnull String url, @Nullable HttpClient.AuthenticationToken previousToken, @Nonnull Consumer<HttpClient.AuthenticationToken> callback) {
         try {
@@ -117,11 +143,7 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
                 }
             }
             URI uri = new URI(url);
-            String key = new StringBuilder(uri.getScheme())
-                    .append("::")
-                    .append(uri.getHost())
-                    .append("::")
-                    .append(uri.getPort()).toString();
+            String key = HttpClient.uriToKey(uri);
 
             if(previousToken == null){
                 // If we don't have a previous token, check for one in the repo.
@@ -155,6 +177,9 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
         }
     }
 
+    /**
+     * A class for auth tokens that are saved to the props file.
+     */
     static class PersistedAuthenticationToken implements HttpClient.AuthenticationToken {
 
         private final String key;
