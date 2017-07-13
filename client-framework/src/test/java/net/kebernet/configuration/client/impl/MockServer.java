@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.client.impl;
 
+import net.kebernet.configuration.client.util.URIUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -61,7 +62,7 @@ public class MockServer {
         ServletHandler servletHandler = new ServletHandler();
         servletHandler.addServletWithMapping(HttpBasicAuthServlet.class, "/authenticated");
         servletHandler.addServletWithMapping(RedirectServlet.class, "/helloRedirected");
-
+        servletHandler.addServletWithMapping(PermanentRedirectServlet.class, "/helloRedirectedPermanent");
         HandlerCollection serverHandlers = new HandlerCollection();
         serverHandlers.setHandlers(new Handler[]{ resourceHandler, servletHandler});
         server.setHandler(serverHandlers);
@@ -102,6 +103,15 @@ public class MockServer {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.sendRedirect("/hello");
+        }
+    }
+
+    public static class PermanentRedirectServlet extends  HttpServlet {
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            String url = URIUtil.resolveRelativeURI(req.getRequestURL().toString(), "/hello");
+            resp.setHeader("Location", url);
         }
     }
 }

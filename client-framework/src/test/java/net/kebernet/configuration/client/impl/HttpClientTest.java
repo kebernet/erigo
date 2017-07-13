@@ -70,6 +70,33 @@ public class HttpClientTest {
     }
 
     @Test
+    public void testPermanentRedirectedGet() throws Exception {
+        HttpClient client = new HttpClient();
+        int port = MockServer.randomPort();
+        MockServer mockServer = new MockServer(port);
+        SettableFuture<String> result = SettableFuture.create();
+        client.getToStream("http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
+            try {
+                result.set(CharStreams.toString(reader));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        String read = result.get(1, TimeUnit.SECONDS);
+        assertEquals("world", read);
+        client.getToStream("http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
+            try {
+                result.set(CharStreams.toString(reader));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        read = result.get(1, TimeUnit.SECONDS);
+        assertEquals("world", read);
+        mockServer.stop();
+    }
+
+    @Test
     public void testAuthenticatedGet() throws Exception {
         int port = MockServer.randomPort();
         String checkUrl = "http://localhost:"+port+"/authenticated";
