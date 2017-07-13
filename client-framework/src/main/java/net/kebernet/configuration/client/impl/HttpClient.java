@@ -19,6 +19,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -29,7 +31,6 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,12 +41,14 @@ import java.util.logging.Logger;
 @SuppressWarnings("WeakerAccess")
 public class HttpClient {
     public static final String AUTHENTICATION_HEADER = "Authentication";
-    private static final ExecutorService DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
+    private static final ExecutorService DEFAULT_EXECUTOR = Executor.getInstance();
     private static final Logger LOGGER = Logger.getLogger(HttpClient.class.getCanonicalName());
     private static final ConcurrentHashMap<String, String> PERMANENT_REDIRECTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, AuthenticationToken> TOKEN_MAP = new ConcurrentHashMap<>();
     private AuthenticationCallback authenticationCallback;
     private ErrorCallback errorCallback;
+    private SSLSocketFactory sslSocketFactory;
+
 
     /**
      * Parses URI and generates a key for token caching
@@ -75,6 +78,10 @@ public class HttpClient {
                 .append(uri.getPort()).toString();
     }
 
+    public static void clearCachedAuthentication(){
+        TOKEN_MAP.clear();
+    }
+
     /**
      * Makes a get request.
      *
@@ -92,6 +99,9 @@ public class HttpClient {
             DEFAULT_EXECUTOR.submit(() -> {
                 try {
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                    if(sslSocketFactory != null && connection instanceof HttpsURLConnection){
+                        ((HttpsURLConnection)connection).setSSLSocketFactory(sslSocketFactory);
+                    }
                     connection.setInstanceFollowRedirects(false);
                     if (token != null) {
                         connection.setRequestProperty(AUTHENTICATION_HEADER,
@@ -146,6 +156,10 @@ public class HttpClient {
      */
     public void setErrorCallback(ErrorCallback callback) {
         this.errorCallback = callback;
+    }
+
+    public void setSSLSocketFactory(SSLSocketFactory factory){
+        this.sslSocketFactory = factory;
     }
 
     private void maybeSendError(String message) {
@@ -307,13 +321,17 @@ public class HttpClient {
 
         @Override
         public void authenticationRequired(String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback) {
-            wrapped.authenticationRequired(url, previousToken, (nextToken) -> {
-                if (Objects.equal(nextToken, previousToken)) {
-                    maybeSendError(String.format("Couldn't authenticate with %s", url));
-                } else {
-                    callback.accept(nextToken);
-                }
-            });
+            try {
+                wrapped.authenticationRequired(url, previousToken, (nextToken) -> {
+                    if (Objects.equal(nextToken, previousToken)) {
+                        maybeSendError(String.format("Couldn't authenticate with %s", url));
+                    } else {
+                        callback.accept(nextToken);
+                    }
+                });
+            } catch(Exception e){
+                LOGGER.log(Level.SEVERE, null, e);
+            }
         }
     }
 }

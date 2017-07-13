@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static net.kebernet.configuration.client.impl.HttpClient.clearCachedAuthentication;
 import static org.junit.Assert.*;
 
 /**
@@ -53,9 +54,6 @@ public class HttpClientTest {
     @Test
     public void testSimpleGet() throws Exception {
         HttpClient client = new HttpClient();
-
-
-
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("http://localhost:"+port+"/hello", (reader)->{
             try {
@@ -135,19 +133,18 @@ public class HttpClientTest {
 
     @Test(expected = TimeoutException.class)
     public void testFailedAuthenticatedGet() throws Exception {
-        int port = MockServer.randomPort();
         String checkUrl = "http://localhost:"+port+"/authenticated";
         AtomicBoolean didAuth = new AtomicBoolean(false);
         AtomicReference<String> error = new AtomicReference<>(null);
 
         HttpClient client = new HttpClient();
+        clearCachedAuthentication();
         client.setErrorCallback(error::set);
         client.setAuthenticationCallback((url, previousToken, callback) -> {
             assertEquals(checkUrl, url);
             didAuth.set(true);
             callback.accept(new HttpClient.BasicAuthenticationToken("user", "invalid password"));
         });
-        MockServer mockServer = new MockServer(port);
         try {
 
             SettableFuture<String> result = SettableFuture.create();

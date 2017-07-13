@@ -36,6 +36,7 @@ public class Device {
     private String settingsUrl;
     private String settingsValuesUrl;
     private String webUiUrl;
+    private String tlsCertificateUrl;
 
     public String getAddress() {
         return address;
@@ -101,6 +102,14 @@ public class Device {
         this.webUiUrl = webUiUrl;
     }
 
+    public String getTlsCertificateUrl() {
+        return tlsCertificateUrl;
+    }
+
+    public void setTlsCertificateUrl(String tlsCertificateUrl) {
+        this.tlsCertificateUrl = tlsCertificateUrl;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -112,6 +121,7 @@ public class Device {
                 .add("settingsUrl", getSettingsUrl())
                 .add("settingsValuesUrl", getSettingsValuesUrl())
                 .add("webUiUrl", getWebUiUrl())
+                .add("tlsCertificateUrl",getTlsCertificateUrl())
                 .toString();
     }
 
@@ -127,11 +137,12 @@ public class Device {
                 Objects.equal(thumbnailUrl, device.thumbnailUrl) &&
                 Objects.equal(settingsUrl, device.settingsUrl) &&
                 Objects.equal(settingsValuesUrl, device.settingsValuesUrl) &&
-                Objects.equal(webUiUrl, device.webUiUrl);
+                Objects.equal(webUiUrl, device.webUiUrl) &&
+                Objects.equal(tlsCertificateUrl, device.tlsCertificateUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(address, name, type, manufacturer, thumbnailUrl, settingsUrl);
+        return Objects.hashCode(address, name, type, manufacturer, thumbnailUrl, settingsUrl, webUiUrl, tlsCertificateUrl);
     }
 }

@@ -56,8 +56,12 @@ allprojects{
 configure(subprojects - project(':android')) {
 
     task installGitHooks(type: Copy) {
-        from new File(rootProject.rootDir, '/etc/pre-commit.sh')
+        from(new File(rootProject.rootDir, '/etc/pre-commit.sh')) {
+            rename('(.*)\\.sh', '$1')
+        }
         into { new File(rootProject.rootDir, '.git/hooks/') }
+
+
     }
 
     build.dependsOn installGitHooks

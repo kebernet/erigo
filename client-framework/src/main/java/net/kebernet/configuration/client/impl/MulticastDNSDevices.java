@@ -38,7 +38,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +48,7 @@ import java.util.logging.Logger;
 public class MulticastDNSDevices implements Devices {
     public static final String MDNS_SERVICE_TYPE = "_v1._iotconfig._tcp.local.";
     private static final Logger LOGGER = Logger.getLogger(MulticastDNSDevices.class.getCanonicalName());
-    private static final ExecutorService DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
+    private static final ExecutorService DEFAULT_EXECUTOR = Executor.getInstance();
     private final CopyOnWriteArrayList<DeviceListCallback> listeningCallbacks = new CopyOnWriteArrayList<>();
     private Timer timer;
     private JmDNS jmdns;
