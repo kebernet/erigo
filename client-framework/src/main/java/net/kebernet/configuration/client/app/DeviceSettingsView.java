@@ -16,8 +16,10 @@
 package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Settings;
-import net.kebernet.configuration.client.model.SettingsValue;
+import net.kebernet.configuration.client.model.SettingValue;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
@@ -28,15 +30,15 @@ public interface DeviceSettingsView {
     void showLoading();
     void hideLoading();
 
-    void setDeviceName(String name);
-    void setSettings(Settings settings, Collection<SettingsValue> values);
+    void setDeviceName(@Nonnull String name);
+    void setSettings(Settings settings, Collection<SettingValue> values);
 
-    void setSettingChangedCallback(SettingsChangedCallback callback);
-    void setSaveCallback(SaveCallback callback);
-    void setCancelCallback(CancelCallback callback);
+    void setSettingChangedCallback(@Nonnull SettingsChangedCallback callback);
+    void setSaveCallback(@Nullable SaveCallback callback);
+    void setCancelCallback(@Nonnull CancelCallback callback);
 
     interface SettingsChangedCallback {
-        void onSettingChanged(String name, String value);
+        void onSettingChanged(@Nonnull String name, @Nullable String value);
     }
 
     interface SaveCallback {

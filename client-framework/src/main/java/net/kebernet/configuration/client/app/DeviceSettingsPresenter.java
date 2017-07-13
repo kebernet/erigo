@@ -17,12 +17,12 @@ package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Device;
 import net.kebernet.configuration.client.model.Settings;
-import net.kebernet.configuration.client.model.SettingsValue;
-import net.kebernet.configuration.client.service.DeviceSettings;
+import net.kebernet.configuration.client.model.SettingValue;
+import net.kebernet.configuration.client.service.SettingsService;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,19 +33,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback, DeviceSettingsView.SettingsChangedCallback, DeviceSettingsView.CancelCallback {
 
     private final DeviceSettingsView view;
-    private final DeviceSettings service;
+    private final SettingsService service;
     private Settings settings;
-    private List<SettingsValue> values;
+    private List<SettingValue> values;
     private AtomicInteger responseCount = new AtomicInteger();
     private AppFlow appFlow;
 
     @Inject
-    public DeviceSettingsPresenter(DeviceSettingsView view, DeviceSettings service) {
+    public DeviceSettingsPresenter(@Nonnull DeviceSettingsView view,
+                                   @Nonnull SettingsService service) {
         this.view = view;
         this.service = service;
     }
 
-    public void bind(AppFlow flow, Device device){
+    public void bind(@Nonnull AppFlow flow, @Nonnull Device device){
         this.appFlow = flow;
         view.setDeviceName(device.getName());
         view.setSettingChangedCallback(this);

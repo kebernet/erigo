@@ -17,6 +17,7 @@ package net.kebernet.configuration.client.service;
 
 import net.kebernet.configuration.client.model.Device;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,15 +30,15 @@ import java.util.logging.Logger;
 /**
  * Created by rcooper on 7/4/17.
  */
-public class CompositeDevices implements Devices {
-    private static final Logger LOGGER = Logger.getLogger(CompositeDevices.class.getCanonicalName());
+public class CompositeDiscoveryService implements DiscoveryService {
+    private static final Logger LOGGER = Logger.getLogger(CompositeDiscoveryService.class.getCanonicalName());
     private static final ExecutorService defaultExecutor = Executors.newWorkStealingPool();
-    private final Devices[] internal;
+    private final DiscoveryService[] internal;
     private final CopyOnWriteArrayList<DeviceListCallback> listeners = new CopyOnWriteArrayList<>();
 
-    public CompositeDevices(Devices... internal) {
+    public CompositeDiscoveryService(@Nonnull DiscoveryService... internal) {
         this.internal = internal;
-        for(Devices devices : internal){
+        for(DiscoveryService devices : internal){
             devices.listenForDevices(result -> {
                 for(DeviceListCallback callback : listeners){
                     if(!callback.onDevices(result)){
@@ -80,7 +81,7 @@ public class CompositeDevices implements Devices {
 
     @Override
     public void setErrorCallback(ErrorCallback callback) {
-        for(Devices d: internal){
+        for(DiscoveryService d: internal){
             d.setErrorCallback(callback);
         }
     }

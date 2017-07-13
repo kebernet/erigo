@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.client.impl;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.Executors;
  */
 public class Executor {
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(3);
+    @Nonnull
     public static ExecutorService getInstance(){
         return EXECUTOR_SERVICE;
     }

@@ -16,22 +16,22 @@
 package net.kebernet.configuration.client.service;
 
 import net.kebernet.configuration.client.model.Settings;
-import net.kebernet.configuration.client.model.SettingsValue;
+import net.kebernet.configuration.client.model.SettingValue;
 
 import java.util.List;
 
 /**
  * Created by rcooper on 7/3/17.
  */
-public interface DeviceSettings {
+public interface SettingsService {
 
     boolean canResolve(String settingsAddress);
     void listSettings(String settingsAddress, SettingsCallback callback);
     void listValues(String valuesUrl, ValuesCallback callback);
-    void saveSettings(String valuesAddress, List<SettingsValue> values, SaveCallback callback);
+    void saveSettings(String valuesAddress, List<SettingValue> values, SaveCallback callback);
 
     interface ValuesCallback {
-        void onValuesResponse(List<SettingsValue> values);
+        void onValuesResponse(List<SettingValue> values);
     }
 
     interface SettingsCallback {

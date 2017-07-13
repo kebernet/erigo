@@ -15,7 +15,7 @@
  */
 package net.kebernet.configuration.client.service;
 
-import net.kebernet.configuration.client.model.SettingsValue;
+import net.kebernet.configuration.client.model.SettingValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,11 +23,11 @@ import java.util.List;
 /**
  * Created by rcooper on 7/6/17.
  */
-public class CompositeDeviceSettings implements DeviceSettings {
+public class CompositeSettingsService implements SettingsService {
 
-    private final List<DeviceSettings> internal;
+    private final List<SettingsService> internal;
 
-    public CompositeDeviceSettings(DeviceSettings... internal) {
+    public CompositeSettingsService(SettingsService... internal) {
         this.internal = Arrays.asList(internal);
     }
 
@@ -53,7 +53,7 @@ public class CompositeDeviceSettings implements DeviceSettings {
     }
 
     @Override
-    public void saveSettings(String valuesAddress, List<SettingsValue> values, SaveCallback callback) {
+    public void saveSettings(String valuesAddress, List<SettingValue> values, SaveCallback callback) {
         internal.stream()
                 .filter(s-> s.canResolve(valuesAddress))
                 .findFirst()

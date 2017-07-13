@@ -21,7 +21,7 @@ import com.intellij.uiDesigner.core.Spacer;
 import net.kebernet.configuration.client.app.DeviceSettingsView;
 import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.Settings;
-import net.kebernet.configuration.client.model.SettingsValue;
+import net.kebernet.configuration.client.model.SettingValue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -82,7 +82,7 @@ public class SettingsView implements DeviceSettingsView, DeviceSettingsView.Sett
     }
 
     @Override
-    public void setSettings(Settings settings, Collection<SettingsValue> values) {
+    public void setSettings(Settings settings, Collection<SettingValue> values) {
         SwingUtilities.invokeLater(() -> {
             groupTabs.removeAll();
             HashMap<String, String> vals = new HashMap<>();

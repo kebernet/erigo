@@ -21,7 +21,7 @@ import com.google.common.base.Objects;
 /**
  * Created by rcooper on 7/11/17.
  */
-public class SettingsValue {
+public class SettingValue {
     private String name;
     private String value;
 
@@ -52,8 +52,8 @@ public class SettingsValue {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SettingsValue)) return false;
-        SettingsValue that = (SettingsValue) o;
+        if (!(o instanceof SettingValue)) return false;
+        SettingValue that = (SettingValue) o;
         return Objects.equal(name, that.name) &&
                 Objects.equal(value, that.value);
     }

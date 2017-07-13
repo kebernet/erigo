@@ -16,8 +16,9 @@
 package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Device;
-import net.kebernet.configuration.client.service.Devices;
+import net.kebernet.configuration.client.service.DiscoveryService;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.LinkedHashSet;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
 public class DeviceListPresenter implements DeviceListView.RefreshCallback, DeviceListView.DeviceSelectionCallback {
     private static final Logger LOGGER = Logger.getLogger(DeviceListPresenter.class.getCanonicalName());
     private final DeviceListView view;
-    private final Devices service;
+    private final DiscoveryService service;
     private AppFlow appFlow;
 
     private final LinkedHashSet<Device> knownDevices = new LinkedHashSet<>();
@@ -38,22 +39,24 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
 
 
     @Inject
-    public DeviceListPresenter(DeviceListView view, Devices service) {
+    public DeviceListPresenter(@Nonnull DeviceListView view, @Nonnull DiscoveryService service) {
         this.view = view;
         this.service = service;
     }
 
-    public void bind(AppFlow flow) {
+    public void bind(@Nonnull AppFlow flow) {
         this.appFlow = flow;
         isShutdown = false;
         view.setDeviceSelectionCallback(this);
         view.setRefreshClicked(this);
         service.listKnownDevices(devices -> {
+            knownDevices.addAll(devices);
             view.showDeviceList(devices);
             return false;
         });
         service.listenForDevices(devices -> {
             view.addDevicesToList(devices);
+            knownDevices.addAll(devices);
             return isShutdown;
         });
         service.refresh();
@@ -74,6 +77,7 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
 
     @Override
     public void onRefreshClicked() {
+        knownDevices.clear();
         service.refresh();
     }
 

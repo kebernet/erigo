@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Created by rcooper on 7/3/17.
  */
-public interface Devices {
+public interface DiscoveryService {
 
     /**
      * Adds a callback that will be notified whenever new devices are discovered.
@@ -40,7 +40,7 @@ public interface Devices {
 
     /**
      * Sets an error callback. This will provide messages that can be presented to the user
-     * when an error occurs inside the Devices service.
+     * when an error occurs inside the DiscoveryService service.
      * @param callback ErrorCallback
      */
     void setErrorCallback(ErrorCallback callback);
@@ -66,7 +66,7 @@ public interface Devices {
 
     /**
      * A callback that can be used to present the user with error messages about the
-     * internal state of the Devices services
+     * internal state of the DiscoveryService services
      */
     interface ErrorCallback{
         /**

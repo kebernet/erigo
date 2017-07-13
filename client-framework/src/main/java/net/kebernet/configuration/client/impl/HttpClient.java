@@ -19,6 +19,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -39,6 +41,7 @@ import java.util.logging.Logger;
  * This is a simple HTTP client built on java.io for x-plat availability.
  */
 @SuppressWarnings("WeakerAccess")
+@Singleton
 public class HttpClient {
     public static final String AUTHENTICATION_HEADER = "Authentication";
     private static final ExecutorService DEFAULT_EXECUTOR = Executor.getInstance();
@@ -48,6 +51,10 @@ public class HttpClient {
     private AuthenticationCallback authenticationCallback;
     private ErrorCallback errorCallback;
     private SSLSocketFactory sslSocketFactory;
+
+    @Inject
+    public HttpClient(){
+    }
 
 
     /**

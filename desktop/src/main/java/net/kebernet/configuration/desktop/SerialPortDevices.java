@@ -26,7 +26,7 @@ import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import net.kebernet.configuration.client.model.Device;
-import net.kebernet.configuration.client.service.Devices;
+import net.kebernet.configuration.client.service.DiscoveryService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  * Created by rcooper on 7/5/17.
  */
 @GwtIncompatible
-public class SerialPortDevices implements Devices {
+public class SerialPortDevices implements DiscoveryService {
     private static final ExecutorService DEFAULT_EXECUTOR = Executors.newWorkStealingPool();
     private static final Logger LOGGER = Logger.getLogger(SerialPortDevices.class.getCanonicalName());
     private static final int COMM_PORT_TIMEOUT = 2000;

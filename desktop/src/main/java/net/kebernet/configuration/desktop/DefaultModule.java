@@ -19,11 +19,12 @@ import dagger.Module;
 import dagger.Provides;
 import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.app.DeviceSettingsView;
+import net.kebernet.configuration.client.impl.HttpClient;
 import net.kebernet.configuration.client.impl.HttpDeviceSettings;
 import net.kebernet.configuration.client.impl.MulticastDNSDevices;
-import net.kebernet.configuration.client.service.CompositeDevices;
-import net.kebernet.configuration.client.service.DeviceSettings;
-import net.kebernet.configuration.client.service.Devices;
+import net.kebernet.configuration.client.service.CompositeDiscoveryService;
+import net.kebernet.configuration.client.service.DiscoveryService;
+import net.kebernet.configuration.client.service.SettingsService;
 
 import javax.inject.Singleton;
 
@@ -37,16 +38,20 @@ import javax.inject.Singleton;
 )
 public class DefaultModule {
 
-    @Provides
-    @Singleton
-    public Devices devices(){
-        return new CompositeDevices(new MulticastDNSDevices(), new SerialPortDevices());
-    }
+    private final HttpClient client = new HttpClient();
 
     @Provides
     @Singleton
-    public DeviceSettings settings(){
-        return new HttpDeviceSettings();
+    public DiscoveryService devices(){
+        return new CompositeDiscoveryService(new MulticastDNSDevices(), new SerialPortDevices());
+    }
+
+
+
+    @Provides
+    @Singleton
+    public SettingsService settings(){
+        return new HttpDeviceSettings(client);
     }
 
     @Provides

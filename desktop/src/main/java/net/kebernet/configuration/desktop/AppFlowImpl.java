@@ -17,7 +17,6 @@ package net.kebernet.configuration.desktop;
 
 import net.kebernet.configuration.client.app.AppFlow;
 import net.kebernet.configuration.client.app.DeviceListPresenter;
-import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.app.DeviceSettingsPresenter;
 import net.kebernet.configuration.client.model.Device;
 

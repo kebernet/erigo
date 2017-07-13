@@ -20,8 +20,10 @@ import com.google.common.base.Objects;
 import com.google.common.io.CharStreams;
 import com.google.gson.Gson;
 import net.kebernet.configuration.client.model.Device;
-import net.kebernet.configuration.client.service.Devices;
+import net.kebernet.configuration.client.service.DiscoveryService;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
@@ -41,11 +43,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created by rcooper on 7/4/17.
  */
 @GwtIncompatible
-public class MulticastDNSDevices implements Devices {
+public class MulticastDNSDevices implements DiscoveryService {
     public static final String MDNS_SERVICE_TYPE = "_v1._iotconfig._tcp.local.";
     private static final Logger LOGGER = Logger.getLogger(MulticastDNSDevices.class.getCanonicalName());
     private static final ExecutorService DEFAULT_EXECUTOR = Executor.getInstance();
@@ -64,23 +68,25 @@ public class MulticastDNSDevices implements Devices {
     }
 
     @Override
-    public void listenForDevices(DeviceListCallback callback) {
+    public void listenForDevices(@Nonnull DeviceListCallback callback) {
+        checkNotNull(callback, "Cannot use a null callback.");
         this.listeningCallbacks.add(callback);
     }
 
     @Override
-    public void listKnownDevices(DeviceListCallback callback) {
+    public void listKnownDevices(@Nonnull DeviceListCallback callback) {
+        checkNotNull(callback, "Cannot use a null callback.");
         DEFAULT_EXECUTOR.submit(()->dispatchKnownDevices(callback));
     }
 
-    private void dispatchKnownDevices(DeviceListCallback callback) {
+    private void dispatchKnownDevices(@Nonnull DeviceListCallback callback) {
         synchronized (devices) {
             callback.onDevices(new ArrayList<>(devices.values()));
         }
     }
 
     @Override
-    public void setErrorCallback(ErrorCallback callback) {
+    public void setErrorCallback(@Nullable ErrorCallback callback) {
         this.errorCallback = callback;
     }
 

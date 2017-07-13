@@ -17,11 +17,13 @@ package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Device;
 
+import javax.annotation.Nonnull;
+
 /**
  * Created by rcooper on 7/6/17.
  */
 public interface AppFlow {
 
     void showDeviceList();
-    void showDevice(Device device);
+    void showDevice(@Nonnull Device device);
 }

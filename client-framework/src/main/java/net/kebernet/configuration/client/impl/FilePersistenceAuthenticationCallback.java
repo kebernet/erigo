@@ -78,7 +78,8 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
      * @return Result of the callable.
      * @throws IOException The only thrown checked exception. All others become runtime.
      */
-    private static synchronized <T> T syncExecute(Callable<T> r) throws IOException {
+    @Nullable
+    private static synchronized <T> T syncExecute(@Nonnull Callable<T> r) throws IOException {
         try {
             return r.call();
         } catch (IOException e) {

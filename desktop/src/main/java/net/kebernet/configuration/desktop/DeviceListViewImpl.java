@@ -155,7 +155,7 @@ public class DeviceListViewImpl implements DeviceListView {
         final Spacer spacer1 = new Spacer();
         root.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         devicesLabel = new JLabel();
-        devicesLabel.setText("Devices");
+        devicesLabel.setText("DiscoveryService");
         root.add(devicesLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 

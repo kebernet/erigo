@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.client.impl;
 
+import javax.annotation.Nonnull;
 import javax.net.SocketFactory;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -41,26 +42,26 @@ public class CertificateTool {
 
     private final KeyStore trustStore;
 
-    public CertificateTool(KeyStore trustStore) {
+    public CertificateTool(@Nonnull KeyStore trustStore) {
         this.trustStore = trustStore;
     }
 
-    public void addCertificatesForUrl(String url) throws Exception {
+    public void addCertificatesForUrl(@Nonnull  String url) throws Exception {
         addCertificatesToKeyStore(fetchCertificatesForUrl(url));
     }
 
-    public void addCertificatesToKeyStore(List<X509Certificate>certificates) throws KeyStoreException {
+    public void addCertificatesToKeyStore(@Nonnull List<X509Certificate> certificates) throws KeyStoreException {
         for(X509Certificate c: certificates){
             trustStore.setCertificateEntry("imported-"+c.getSerialNumber(), c);
         }
     }
 
-    public List<X509Certificate> fetchCertificatesForUrl(String aURL) throws Exception {
+    public List<X509Certificate> fetchCertificatesForUrl(@Nonnull String aURL) throws Exception {
         URL url = new URL(aURL);
         return fetchCertificatesForSocket(url.getHost(), url.getPort());
     }
 
-    public List<X509Certificate> fetchCertificatesForSocket(String host, int port) throws Exception {
+    public List<X509Certificate> fetchCertificatesForSocket(@Nonnull String host, int port) throws Exception {
         SSLContext context = SSLContext.getInstance("SSL");
         TrustManager trustAllCerts =
             new X509TrustManager() {
