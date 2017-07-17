@@ -29,7 +29,7 @@ public class WifiConfigWriterTest {
         if(System.getProperty("build.dir") == null){
             throw new RuntimeException("No build dir");
         }
-        File dir = new File(System.getProperty("build.dir")+"/test", WifiConfigWriterTest.class.getSimpleName());
+        File dir = new File(System.getProperty("build.dir")+"/test", WifiConfigWriterTest.class.getSimpleName()+"-adhocConfig");
         File etc = new File(dir, "etc");
         if(!dir.mkdirs() || !dir.mkdir()){
             Logger.getAnonymousLogger().info("Didn't mkdir "+dir);

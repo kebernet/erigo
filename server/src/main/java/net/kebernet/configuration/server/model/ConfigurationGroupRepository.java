@@ -19,6 +19,9 @@ import net.kebernet.configuration.client.impl.GsonFactory;
 import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.server.FileUtils;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,10 +33,6 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * Created by rcooper on 7/15/17.
  */
@@ -42,6 +41,7 @@ public class ConfigurationGroupRepository {
     private static final Logger LOGGER = Logger.getLogger(ConfigurationGroupRepository.class.getCanonicalName());
     private final File storageDirectory;
     private final ArrayList<ConfigurationGroup> groups = new ArrayList<>();
+    private long previousNewestTimestamp = Long.MIN_VALUE;
 
     @Inject
     public ConfigurationGroupRepository(@Named("storageDirectory") File storageDirectory) {
@@ -55,7 +55,29 @@ public class ConfigurationGroupRepository {
         }
     }
 
-    public synchronized void load() throws IOException {
+    private boolean isAnyFileNewerThanLastCheck() {
+        File configs = new File(storageDirectory, "configs");
+        long newestTimestamp = FileUtils.recursiveListOfRegularFiles(configs)
+                .map(File::lastModified)
+                .max(Comparator.naturalOrder())
+                .orElse(previousNewestTimestamp);
+        if(newestTimestamp > this.previousNewestTimestamp){
+            this.previousNewestTimestamp = newestTimestamp;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks the last modified time of the files in the configuration repository
+     * and maybe reloads the internal "groups" property
+     * @return Whether a load was performed.
+     * @throws IOException Something couldn't be read.
+     */
+    public synchronized boolean load() throws IOException {
+        if(!isAnyFileNewerThanLastCheck()){
+            return false;
+        }
         groups.clear();
         File configs = new File(storageDirectory, "configs");
         if (configs.exists()) {
@@ -69,6 +91,7 @@ public class ConfigurationGroupRepository {
             groups.add(loadRoot(f));
         }
         groups.sort(Comparator.comparingInt(o -> o.getSettingsGroup().getIndex()));
+        return true;
     }
 
     public List<ConfigurationGroup> getGroups() {
@@ -80,7 +103,7 @@ public class ConfigurationGroupRepository {
         group.setName(f.getName());
         group.setSettingsGroup(GsonFactory.readFileAsUTF8(new File(f, "group.json"), Group.class));
         ifFileExist(f, "after.sh", group::setAfterScriptTemplate);
-        ifFileExist(f, "before.sh", group::setAfterScriptTemplate);
+        ifFileExist(f, "before.sh", group::setBeforeScriptTemplate);
         File[] templateDirs = f.listFiles(File::isDirectory);
         templateDirs = templateDirs == null ? new File[0] : templateDirs;
         group.setTemplateFiles(Arrays.stream(templateDirs)

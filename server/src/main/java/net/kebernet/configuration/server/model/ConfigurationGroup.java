@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server.model;
 
+import com.google.common.base.MoreObjects;
 import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.Setting;
 
@@ -82,5 +83,16 @@ public class ConfigurationGroup {
                 .stream()
                 .map(Setting::getName)
                 .anyMatch(settingNames::contains);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("name", name)
+                .add("beforeScriptTemplate", beforeScriptTemplate)
+                .add("afterScriptTemplate", afterScriptTemplate)
+                .add("settingsGroup", settingsGroup)
+                .add("templateFiles", templateFiles)
+                .toString();
     }
 }

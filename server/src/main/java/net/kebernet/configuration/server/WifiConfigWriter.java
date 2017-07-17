@@ -58,16 +58,17 @@ public class WifiConfigWriter {
         renderContext.put("deviceType", startupParameters.getDeviceType());
         String postFix = "UNKNOWN";
         try {
-            byte[] mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
+            NetworkInterface networkInterface = NetworkInterface.getByName(startupParameters.getWlanInterface());
+            if(networkInterface == null){
+                networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+            }
+            byte[] mac = networkInterface.getHardwareAddress();
             postFix = Integer.toHexString(mac[mac.length - 2]) +
                     Integer.toHexString(mac[mac.length - 1]);
         } catch (UnknownHostException | SocketException e) {
             LOGGER.log(Level.WARNING, "Failed to get MAC address.", e);
         }
-        String networkName = startupParameters.getDeviceType()+"-"+postFix;
-        if(networkName.contains(" ")){
-            networkName = "'"+networkName+"'";
-        }
+        String networkName = startupParameters.getDeviceType()+"-"+postFix+".erigo";
         renderContext.put( "networkName", networkName);
         this.targetDirectory = startupParameters.getTargetDirectory();
         this.settingsDirectory = startupParameters.getStorageDirectory();

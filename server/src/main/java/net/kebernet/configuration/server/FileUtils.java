@@ -30,16 +30,16 @@ public class FileUtils {
 
 
     public static List<String> listAllRelativeFilePaths(File parent) {
-        return  recursiveList(parent)
+        return  recursiveListOfRegularFiles(parent)
                 .map(file -> file.getAbsolutePath().substring(parent.getAbsolutePath().length() + 1))
                 .collect(Collectors.toList());
     }
 
-    private static Stream<File> recursiveList(File parent) {
+    public static Stream<File> recursiveListOfRegularFiles(File parent) {
         return Arrays.stream(neverNull(parent.listFiles()))
             .flatMap((file)->{
                 if (file.isDirectory()) {
-                    return recursiveList(file);
+                    return recursiveListOfRegularFiles(file);
                 } else {
                     return Stream.of(file);
                 }
