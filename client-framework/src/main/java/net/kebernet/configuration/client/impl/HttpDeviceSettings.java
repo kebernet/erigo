@@ -62,27 +62,27 @@ public class HttpDeviceSettings implements SettingsService {
     }
 
     @Override
-    public void listSettings(@Nonnull String settingsAddress, @Nonnull SettingsCallback callback) {
+    public void listSettings(@Nonnull String deviceName, @Nonnull String settingsAddress, @Nonnull SettingsCallback callback) {
         checkNotNull(settingsAddress, NO_SETTINGS_ADDRESS_PROVIDED);
         checkNotNull(callback, YOU_MUST_PROVIDE_A_CALLBACK);
-        client.getToStream(settingsAddress, (stream)->{
+        client.getToStream(deviceName, settingsAddress, (stream)->{
             callback.onSettingsResponse(new Gson().fromJson(stream, Settings.class));
         });
     }
 
     @Override
-    public void listValues(@Nonnull String valuesUrl, @Nonnull ValuesCallback callback) {
+    public void listValues(@Nonnull String deviceName, @Nonnull String valuesUrl, @Nonnull ValuesCallback callback) {
         checkNotNull(valuesUrl, "No values address provided.");
         checkNotNull(callback, YOU_MUST_PROVIDE_A_CALLBACK);
-        client.getToStream(valuesUrl, (stream)->{
-            callback.onValuesResponse(new Gson().fromJson(stream, VALUES_LIST_TYPE));
+        client.getToStream(deviceName, valuesUrl, (stream)->{
+            callback.onValuesResponse(GsonFactory.newInstance().fromJson(stream, VALUES_LIST_TYPE));
         });
     }
 
 
 
     @Override
-    public void saveSettings(String valuesAddress, List<SettingValue> values, SaveCallback callback) {
+    public void saveSettings(String deviceName, String valuesAddress, List<SettingValue> values, SaveCallback callback) {
 
     }
 }

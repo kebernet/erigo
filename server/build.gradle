@@ -23,6 +23,13 @@ dependencies {
     compile 'io.dropwizard:dropwizard-core:1.0.2'
 }
 
+test {
+    systemProperties = [
+            "test.resources": file("src/test/resources").getAbsolutePath(),
+            "build.dir" : project.buildDir.getAbsolutePath()
+    ]
+}
+
 
 
 shadowJar {

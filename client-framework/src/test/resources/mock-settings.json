@@ -22,14 +22,14 @@
       "description" : "Connect your doo \ndad to the network.",
       "settings" : [
         {
-          "name": "wifi_ssid",
-          "description" : "Wi-Fi Network Name",
+          "id": "wifi_ssid",
+          "name" : "Wi-Fi Network Name",
           "type": "text",
           "validationExpression" : ".*"
         },
         {
-          "name": "wifi_password",
-          "description" : "Wi-Fi Password",
+          "id": "wifi_password",
+          "name" : "Wi-Fi Password",
           "type": "password",
           "validationExpression" : ".*"
         }

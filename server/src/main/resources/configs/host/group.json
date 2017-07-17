@@ -1,4 +1,4 @@
-/*
+/**
  *     Copyright (c) 2017 Robert Cooper
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,25 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.server;
-
-/**
- * Created by rcooper on 6/13/17.
- */
-public class ConfigurationSwitcher {
-
-    private final WifiConfigWriter writer;
-
-    public ConfigurationSwitcher(WifiConfigWriter writer) {
-        this.writer = writer;
+{
+  "index": 1,
+  "name": "Host Settings",
+  "description": "Common settings for devices. Making a change here will cause a reboot.",
+  "settings": [
+    {
+      "id": "host_name",
+      "name": "Name",
+      "validationExpression": "^[a-zA-Z1-9]*$"
     }
+  ]
 
-
-    public void runAdHocNetwork(){
-
-    }
-
-    public void runWifiNetwork(){
-
-    }
 }

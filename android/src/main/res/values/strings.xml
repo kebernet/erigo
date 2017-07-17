@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Erigo</string>
-    <string name="action_settings">Settings</string>
+    <string id="app_name">Erigo</string>
+    <string id="action_settings">Settings</string>
 </resources>

@@ -20,6 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.security.KeyStore;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 /**
  * Created by rcooper on 7/13/17.
@@ -43,7 +45,11 @@ public class CertificateToolTest {
     @Test
     public void testCertificateFetch() throws Exception {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        new CertificateTool(trustStore).fetchCertificatesForUrl("https://localhost:" + (port + 1) + "/");
+        List<X509Certificate> certificateList = new CertificateTool(trustStore).fetchCertificatesForUrl("https://localhost:" + (port + 1) + "/");
+        for(X509Certificate certificate : certificateList){
+            System.out.println(certificate.getIssuerDN().getName());
+            System.out.println(certificate.getSubjectAlternativeNames());
+        }
     }
 
 }

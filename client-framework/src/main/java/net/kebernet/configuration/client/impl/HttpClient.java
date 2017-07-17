@@ -21,6 +21,7 @@ import com.google.common.base.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -95,11 +96,11 @@ public class HttpClient {
      * @param url      The URL to hit.
      * @param callback A callback with the result.
      */
-    public void getToStream(String url, Consumer<InputStreamReader> callback) {
-        getToStream(url, null, callback);
+    public void getToStream(String deviceName, String url, Consumer<InputStreamReader> callback) {
+        getToStream(deviceName, url, null, callback);
     }
 
-    public void getToStream(String url, AuthenticationToken authenticationToken, Consumer<InputStreamReader> callback) {
+    public void getToStream(String deviceName, String url, AuthenticationToken authenticationToken, Consumer<InputStreamReader> callback) {
         try {
             final URL u = new URL(PERMANENT_REDIRECTS.getOrDefault(url, url));
             AuthenticationToken token = TOKEN_MAP.getOrDefault(uriToKey(u.toURI()), authenticationToken);
@@ -107,7 +108,16 @@ public class HttpClient {
                 try {
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
                     if(sslSocketFactory != null && connection instanceof HttpsURLConnection){
-                        ((HttpsURLConnection)connection).setSSLSocketFactory(sslSocketFactory);
+                        HttpsURLConnection httpsConnection = (HttpsURLConnection)connection ;
+                        httpsConnection.setSSLSocketFactory(sslSocketFactory);
+                        // Verify the hostname with a discovered device name, or the usual methods.
+                        httpsConnection.setHostnameVerifier((s, sslSession) -> {
+                            HostnameVerifier defaultVerifier =
+                                    HttpsURLConnection.getDefaultHostnameVerifier();
+                            return defaultVerifier.verify(s, sslSession) ||
+                                    defaultVerifier.verify(deviceName, sslSession);
+                        });
+
                     }
                     connection.setInstanceFollowRedirects(false);
                     if (token != null) {
@@ -126,10 +136,10 @@ public class HttpClient {
                             PERMANENT_REDIRECTS.put(url, connection.getHeaderField("Location"));
                         case 302:
                         case 303:
-                            getToStream(connection.getHeaderField("Location"), token, callback);
+                            getToStream(deviceName, connection.getHeaderField("Location"), token, callback);
                             return;
                         case 403:
-                            requestAuthorization(url, token, callback);
+                            requestAuthorization(deviceName, url, token, callback);
                             return;
                         default:
                             throw new IOException("Unexpected response code " + connection.getResponseCode() + " from " + url);
@@ -175,19 +185,19 @@ public class HttpClient {
         }
     }
 
-    private void requestAuthorization(String url, AuthenticationToken token, Consumer<InputStreamReader> callback) throws IOException {
+    private void requestAuthorization(String deviceName, String url, AuthenticationToken token, Consumer<InputStreamReader> callback) throws IOException {
         if (this.authenticationCallback == null) {
             String error = String.format("The following URL requires authentication, but there is no handler: %s", url);
             maybeSendError(error);
             throw new IOException(String.format("The following URL requires authentication, but there is no handler: %s", url));
         }
-        new NoRetryAuthenticationCallback(this.authenticationCallback).authenticationRequired(url, token, (authenticationToken) -> {
+        new NoRetryAuthenticationCallback(this.authenticationCallback).authenticationRequired(deviceName, url, token, (authenticationToken) -> {
             if (authenticationToken == null) {
                 throw new RuntimeException("Didn't get authentication token!");
             }
             try {
                 TOKEN_MAP.put(urlToKey(url), authenticationToken);
-                this.getToStream(url, authenticationToken, callback);
+                this.getToStream(deviceName, url, authenticationToken, callback);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, null, e);
             }
@@ -198,7 +208,7 @@ public class HttpClient {
      * A callback
      */
     public interface AuthenticationCallback {
-        void authenticationRequired(String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback);
+        void authenticationRequired(String deviceName, String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback);
     }
 
     /**
@@ -327,9 +337,9 @@ public class HttpClient {
         }
 
         @Override
-        public void authenticationRequired(String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback) {
+        public void authenticationRequired(String deviceName, String url, AuthenticationToken previousToken, Consumer<AuthenticationToken> callback) {
             try {
-                wrapped.authenticationRequired(url, previousToken, (nextToken) -> {
+                wrapped.authenticationRequired(deviceName, url, previousToken, (nextToken) -> {
                     if (Objects.equal(nextToken, previousToken)) {
                         maybeSendError(String.format("Couldn't authenticate with %s", url));
                     } else {

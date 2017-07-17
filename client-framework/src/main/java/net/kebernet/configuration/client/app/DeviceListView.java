@@ -18,6 +18,7 @@ package net.kebernet.configuration.client.app;
 import net.kebernet.configuration.client.model.Device;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -29,9 +30,9 @@ public interface DeviceListView {
 
     void addDevicesToList(@Nonnull List<Device> devices);
 
-    void setDeviceSelectionCallback(@Nonnull DeviceSelectionCallback callback);
+    void setDeviceSelectionCallback(@Nullable DeviceSelectionCallback callback);
 
-    void setRefreshClicked(@Nonnull RefreshCallback callback);
+    void setRefreshClicked(@Nullable RefreshCallback callback);
 
     interface DeviceSelectionCallback {
         void onDeviceSelected(@Nonnull Device device);

@@ -13,15 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.server.data;
-
-import net.kebernet.configuration.client.model.Settings;
+package net.kebernet.configuration.server;
 
 /**
- * Created by rcooper on 6/20/17.
+ * Created by rcooper on 6/13/17.
  */
-public interface SettingsRepository {
+public class WifiSwitcher {
 
-    Settings findSettings();
-    void saveSettings(Settings settings);
+    private final WifiConfigWriter writer;
+
+    public WifiSwitcher(WifiConfigWriter writer) {
+        this.writer = writer;
+    }
+
+
+    public void runAdHocNetwork(){
+
+    }
+
+    public void runWifiNetwork(){
+
+    }
+
 }

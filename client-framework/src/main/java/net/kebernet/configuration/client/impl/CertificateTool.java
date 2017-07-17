@@ -94,12 +94,13 @@ public class CertificateTool {
         context.init(new KeyManager[0], tm, new SecureRandom());
         SocketFactory factory =  context.getSocketFactory();
 
-        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-        socket.startHandshake();
+        try (SSLSocket socket = (SSLSocket) factory.createSocket(host, port)) {
+            socket.startHandshake();
 
-        Certificate[] certs = socket.getSession().getPeerCertificates();
-        return Arrays.stream(certs)
-                .map( (c)-> (X509Certificate) c)
-                .collect(Collectors.toList());
+            Certificate[] certs = socket.getSession().getPeerCertificates();
+            return Arrays.stream(certs)
+                    .map((c) -> (X509Certificate) c)
+                    .collect(Collectors.toList());
+        }
     }
 }

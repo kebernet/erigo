@@ -45,18 +45,22 @@ import java.util.logging.Logger;
  */
 @SuppressWarnings("WeakerAccess")
 public class FilePersistenceAuthenticationCallback implements HttpClient.AuthenticationCallback {
-    private final Logger LOGGER = Logger.getLogger(FilePersistenceAuthenticationCallback.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(FilePersistenceAuthenticationCallback.class.getCanonicalName());
+    private final String deviceName;
     private final Properties properties = new Properties();
     private final HttpClient.AuthenticationCallback nestedCallback;
     private final File propertiesFile;
 
     /**
      * A new constructor
+     *
+     * @param deviceName
      * @param propertiesFile The props file to (maybe) read from
      * @param nestedCallback the callback to wrap with persistence.
      * @throws IOException That is a thing that might happen.
      */
-    public FilePersistenceAuthenticationCallback(@Nonnull File propertiesFile, @Nonnull HttpClient.AuthenticationCallback nestedCallback) throws IOException {
+    public FilePersistenceAuthenticationCallback(@Nonnull String deviceName, @Nonnull File propertiesFile, @Nonnull HttpClient.AuthenticationCallback nestedCallback) throws IOException {
+        this.deviceName = deviceName;
         this.nestedCallback = nestedCallback;
         this.propertiesFile = propertiesFile;
         if(!propertiesFile.getParentFile().exists() && !propertiesFile.getParentFile().mkdirs()){
@@ -133,7 +137,7 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
      * @param callback A callback with the new token.
      */
     @Override
-    public void authenticationRequired(@Nonnull String url, @Nullable HttpClient.AuthenticationToken previousToken, @Nonnull Consumer<HttpClient.AuthenticationToken> callback) {
+    public void authenticationRequired(@Nonnull String deviceName, @Nonnull String url, @Nullable HttpClient.AuthenticationToken previousToken, @Nonnull Consumer<HttpClient.AuthenticationToken> callback) {
         try {
             // If we have a previous token, that means it failed to auth, so let's delete it.
             if(previousToken != null){
@@ -156,11 +160,11 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
             }
 
             // So we are down here. Let's ask the downstream callback for a token then persist it.
-            nestedCallback.authenticationRequired(url,
+            nestedCallback.authenticationRequired(deviceName, url,
                     previousToken instanceof PersistedAuthenticationToken ? null : previousToken,
                     (authenticationToken) -> {
                         try {
-                            persist(new PersistedAuthenticationToken(key, authenticationToken.getScheme() +" "+authenticationToken.getValue()));
+                            persist(new PersistedAuthenticationToken(deviceName, authenticationToken.getScheme() +" "+authenticationToken.getValue()));
                         } catch (IOException e) {
                             LOGGER.log(Level.SEVERE, "Failed to save token: "+authenticationToken, e);
                         }
@@ -187,12 +191,20 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
         private final String scheme;
         private final String value;
 
-        private PersistedAuthenticationToken(String key, String headerLine) {
+        private PersistedAuthenticationToken(String deviceName, String key, String headerLine) {
+            this.key = deviceName+"."+key;
+            int space = headerLine.indexOf(' ');
+            scheme = headerLine.substring(0, space);
+            value = headerLine.substring(space +1);
+        }
+
+        private PersistedAuthenticationToken( String key, String headerLine) {
             this.key = key;
             int space = headerLine.indexOf(' ');
             scheme = headerLine.substring(0, space);
             value = headerLine.substring(space +1);
         }
+
 
         @Override
         public String getScheme() {

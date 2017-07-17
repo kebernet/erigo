@@ -38,21 +38,15 @@ public class FilePersistenceAuthenticationCallbackTest {
         }
         String checkString = "http://localhost:9999/";
         HttpClient.AuthenticationToken checkToken = new HttpClient.BasicAuthenticationToken("user", "password");
-        FilePersistenceAuthenticationCallback callback = new FilePersistenceAuthenticationCallback(testFile,
-                (url, previousToken, callback1) -> {
-                    assertEquals(checkString, url);
-                    assertNull(previousToken);
-                    callback1.accept(checkToken);
-                });
-        FilePersistenceAuthenticationCallback instance = new FilePersistenceAuthenticationCallback(testFile, callback);
-        instance.authenticationRequired(checkString, null, (token)->
-            assertEquals(checkToken, token)
-        );
-        assertTrue(testFile.exists());
-        instance.authenticationRequired(checkString, null, (token)->{
+        FilePersistenceAuthenticationCallback instance = new FilePersistenceAuthenticationCallback("localhost", testFile,
+                ((deviceName, url, previousToken, callback1) -> {
+                assertEquals(checkString, url);
+                assertNull(previousToken);
+                callback1.accept(checkToken);})
+            );
+        instance.authenticationRequired("localhost", checkString, null, (token) ->{
             assertEquals(checkToken.getScheme(), token.getScheme());
             assertEquals(checkToken.getValue(), token.getValue());
-            assertTrue(token instanceof FilePersistenceAuthenticationCallback.PersistedAuthenticationToken);
         });
     }
 

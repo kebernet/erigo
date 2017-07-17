@@ -55,7 +55,7 @@ public class HttpClientTest {
     public void testSimpleGet() throws Exception {
         HttpClient client = new HttpClient();
         SettableFuture<String> result = SettableFuture.create();
-        client.getToStream("http://localhost:"+port+"/hello", (reader)->{
+        client.getToStream("localhost", "http://localhost:"+port+"/hello", (reader)->{
             try {
                 result.set(CharStreams.toString(reader));
             } catch (IOException e) {
@@ -70,7 +70,7 @@ public class HttpClientTest {
     public void testRedirectedGet() throws Exception {
         HttpClient client = new HttpClient();
         SettableFuture<String> result = SettableFuture.create();
-        client.getToStream("http://localhost:"+port+"/helloRedirected", (reader)->{
+        client.getToStream("localhost", "http://localhost:"+port+"/helloRedirected", (reader)->{
             try {
                 result.set(CharStreams.toString(reader));
             } catch (IOException e) {
@@ -85,7 +85,7 @@ public class HttpClientTest {
     public void testPermanentRedirectedGet() throws Exception {
         HttpClient client = new HttpClient();
         SettableFuture<String> result = SettableFuture.create();
-        client.getToStream("http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
+        client.getToStream("localhost", "http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
             try {
                 result.set(CharStreams.toString(reader));
             } catch (IOException e) {
@@ -94,7 +94,7 @@ public class HttpClientTest {
         });
         String read = result.get(1, TimeUnit.SECONDS);
         assertEquals("world", read);
-        client.getToStream("http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
+        client.getToStream("localhost", "http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
             try {
                 result.set(CharStreams.toString(reader));
             } catch (IOException e) {
@@ -110,7 +110,7 @@ public class HttpClientTest {
         String checkUrl = "http://localhost:"+port+"/authenticated";
         AtomicBoolean didAuth = new AtomicBoolean(false);
         HttpClient client = new HttpClient();
-        client.setAuthenticationCallback((url, previousToken, callback) -> {
+        client.setAuthenticationCallback((deviceName, url, previousToken, callback) -> {
             assertEquals(checkUrl, url);
             assertNull(previousToken);
             didAuth.set(true);
@@ -118,7 +118,7 @@ public class HttpClientTest {
         });
 
         SettableFuture<String> result = SettableFuture.create();
-        client.getToStream(checkUrl, (reader)->{
+        client.getToStream("localhost", checkUrl, (reader)->{
             try {
                 result.set(CharStreams.toString(reader));
             } catch (IOException e) {
@@ -140,15 +140,15 @@ public class HttpClientTest {
         HttpClient client = new HttpClient();
         clearCachedAuthentication();
         client.setErrorCallback(error::set);
-        client.setAuthenticationCallback((url, previousToken, callback) -> {
+        client.setAuthenticationCallback(((deviceName, url, previousToken, callback) -> {
             assertEquals(checkUrl, url);
             didAuth.set(true);
             callback.accept(new HttpClient.BasicAuthenticationToken("user", "invalid password"));
-        });
+        }));
         try {
 
             SettableFuture<String> result = SettableFuture.create();
-            client.getToStream(checkUrl, (reader) -> {
+            client.getToStream("localhost", checkUrl, (reader) -> {
                 try {
                     result.set(CharStreams.toString(reader));
                 } catch (IOException e) {

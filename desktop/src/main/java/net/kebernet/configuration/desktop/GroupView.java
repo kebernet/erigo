@@ -51,10 +51,10 @@ public class GroupView {
         this.description.setText(group.getDescription());
         this.fields.setLayout(new MigLayout("wrap 2", "[30%][grow]"));
         group.getSettings().forEach((setting) -> {
-            JLabel label = new JLabel(setting.getDescription());
+            JLabel label = new JLabel(setting.getName());
             JComponent component = factory.getComponentForType(setting.getType(),
-                    values.get(setting.getName()),
-                    (value) -> dispatchValueChange(setting.getName(), value));
+                    values.get(setting.getId()),
+                    (value) -> dispatchValueChange(setting.getId(), value));
             fields.add(label);
             fields.add(component, "growx");
         });

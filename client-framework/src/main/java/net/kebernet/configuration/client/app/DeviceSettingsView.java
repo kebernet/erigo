@@ -33,9 +33,9 @@ public interface DeviceSettingsView {
     void setDeviceName(@Nonnull String name);
     void setSettings(Settings settings, Collection<SettingValue> values);
 
-    void setSettingChangedCallback(@Nonnull SettingsChangedCallback callback);
+    void setSettingChangedCallback(@Nullable SettingsChangedCallback callback);
     void setSaveCallback(@Nullable SaveCallback callback);
-    void setCancelCallback(@Nonnull CancelCallback callback);
+    void setCancelCallback(@Nullable CancelCallback callback);
 
     interface SettingsChangedCallback {
         void onSettingChanged(@Nonnull String name, @Nullable String value);

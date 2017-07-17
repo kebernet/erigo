@@ -41,7 +41,7 @@ This is a single project that includes several subprojects.
     a new network. It can also handle custom settings and services. This is a 
     pattern I totally cribbed from the Amazon Echo. The difference here is we 
     are looking for the ".erigo" ending, rather than a device type for the network 
-    name.
+    id.
  1. arduino: A sample project and code that implements the Erigo protocol over 
     the USB/serial interface and lets you bootstrap settings to be stored in the
     EEPROM.
@@ -53,14 +53,14 @@ How
 
 Erigo is based on a couple of different concepts: devices and settings.
 
-A device is, I dunno, put it together sherlock. It has a name. It has an address
+A device is, I dunno, put it together sherlock. It has a id. It has an address
 (which might be http(s):// or serial://) and some meta-data. Erigo will then poll
 for self-describing JSON data that will tell it about the device. Other than 
 the address, a device has:
 
 ```
 { 
-    "name" : something,
+    "id" : something,
     "type" : something,
     "manufacturer" : something,
     "thumbnailUrl" : something,
@@ -88,16 +88,16 @@ send ``#iot-cfg: Hello`` as it connects. It will look for
  
  ```
  {
-    "description": "something that describes your device and what the user is doing.",
+    "name": "something that describes your device and what the user is doing.",
     "groups" : [
         {
             "index": 0 // this should be considered a suggestion of the order.
-            "name": "foo" 
-            "description" :  "bar" //some text about this group of settings, like "This is how your device will connect to the network.",
+            "id": "foo" 
+            "name" :  "bar" //some text about this group of settings, like "This is how your device will connect to the network.",
             "settings" : [
                 {
-                    "name" : "Blah" ,// settings names need to be unique across device
-                    "description": "Blah in English", // the label for the setting
+                    "id" : "Blah" ,// settings names need to be unique across device
+                    "name": "Blah in English", // the label for the setting
                     "type" : "string",  // a datatype for a setting
                     "validationExpression" : ".*" // a regular expression to validate a string version of the settings.
                      // this value may be dependent on the client app supporting the "type" datatype.
@@ -113,7 +113,7 @@ NB: Everthing about Erigo over the serial port will be prepeded with ``#iot-conf
 So if you want to do debug logging, or support other things over the serial stream, 
 no biggie. Also, all JSON structs should be single-line.
 
-Once you have the description of the settings, you need to update 1..n of them
+Once you have the name of the settings, you need to update 1..n of them
 
 Who
 ---

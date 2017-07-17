@@ -37,27 +37,27 @@ public class CompositeSettingsService implements SettingsService {
     }
 
     @Override
-    public void listSettings(String settingsAddress, SettingsCallback callback) {
+    public void listSettings(String deviceName, String settingsAddress, SettingsCallback callback) {
         internal.stream()
                 .filter(i -> i.canResolve(settingsAddress))
                 .findFirst()
-                .ifPresent(i -> i.listSettings(settingsAddress, callback));
+                .ifPresent(i -> i.listSettings(deviceName, settingsAddress, callback));
     }
 
     @Override
-    public void listValues(String valuesUrl, ValuesCallback callback) {
+    public void listValues(String deviceName, String valuesUrl, ValuesCallback callback) {
         internal.stream()
                 .filter(s-> s.canResolve(valuesUrl))
                 .findFirst()
-                .ifPresent(s-> s.listValues(valuesUrl, callback));
+                .ifPresent(s-> s.listValues(deviceName, valuesUrl, callback));
     }
 
     @Override
-    public void saveSettings(String valuesAddress, List<SettingValue> values, SaveCallback callback) {
+    public void saveSettings(String deviceName, String valuesAddress, List<SettingValue> values, SaveCallback callback) {
         internal.stream()
                 .filter(s-> s.canResolve(valuesAddress))
                 .findFirst()
-                .ifPresent(s-> s.saveSettings(valuesAddress, values, callback));
+                .ifPresent(s-> s.saveSettings(deviceName, valuesAddress, values, callback));
     }
 
 }

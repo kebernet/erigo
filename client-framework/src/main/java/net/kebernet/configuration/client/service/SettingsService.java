@@ -18,6 +18,7 @@ package net.kebernet.configuration.client.service;
 import net.kebernet.configuration.client.model.Settings;
 import net.kebernet.configuration.client.model.SettingValue;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -25,10 +26,10 @@ import java.util.List;
  */
 public interface SettingsService {
 
-    boolean canResolve(String settingsAddress);
-    void listSettings(String settingsAddress, SettingsCallback callback);
-    void listValues(String valuesUrl, ValuesCallback callback);
-    void saveSettings(String valuesAddress, List<SettingValue> values, SaveCallback callback);
+    boolean canResolve(@Nonnull String settingsAddress);
+    void listSettings(@Nonnull String deviceName, @Nonnull String settingsAddress, @Nonnull SettingsCallback callback);
+    void listValues(@Nonnull String deviceName, @Nonnull String valuesUrl, @Nonnull ValuesCallback callback);
+    void saveSettings(@Nonnull String deviceName, @Nonnull String valuesAddress, @Nonnull List<SettingValue> values, @Nonnull SaveCallback callback);
 
     interface ValuesCallback {
         void onValuesResponse(List<SettingValue> values);

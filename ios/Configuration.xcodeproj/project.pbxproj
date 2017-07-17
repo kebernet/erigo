@@ -29,9 +29,9 @@
 		D2268F0C1F0ACFB0008EEFF0 /* Configuration.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Configuration.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2268F0F1F0ACFB0008EEFF0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D2268F111F0ACFB0008EEFF0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		D2268F141F0ACFB1008EEFF0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D2268F141F0ACFB1008EEFF0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; id = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D2268F161F0ACFB1008EEFF0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D2268F191F0ACFB1008EEFF0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D2268F191F0ACFB1008EEFF0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; id = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D2268F1B1F0ACFB2008EEFF0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2268F201F0ACFB2008EEFF0 /* ConfigurationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConfigurationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2268F241F0ACFB2008EEFF0 /* ConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
@@ -71,7 +71,7 @@
 				D2268F0C1F0ACFB0008EEFF0 /* Configuration.app */,
 				D2268F201F0ACFB2008EEFF0 /* ConfigurationTests.xctest */,
 			);
-			name = Products;
+			id = Products;
 			sourceTree = "<group>";
 		};
 		D2268F0E1F0ACFB0008EEFF0 /* Configuration */ = {
@@ -111,7 +111,7 @@
 			);
 			dependencies = (
 			);
-			name = Configuration;
+			id = Configuration;
 			productName = Configuration;
 			productReference = D2268F0C1F0ACFB0008EEFF0 /* Configuration.app */;
 			productType = "com.apple.product-type.application";
@@ -129,7 +129,7 @@
 			dependencies = (
 				D2268F221F0ACFB2008EEFF0 /* PBXTargetDependency */,
 			);
-			name = ConfigurationTests;
+			id = ConfigurationTests;
 			productName = ConfigurationTests;
 			productReference = D2268F201F0ACFB2008EEFF0 /* ConfigurationTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -229,7 +229,7 @@
 			children = (
 				D2268F141F0ACFB1008EEFF0 /* Base */,
 			);
-			name = Main.storyboard;
+			id = Main.storyboard;
 			sourceTree = "<group>";
 		};
 		D2268F181F0ACFB1008EEFF0 /* LaunchScreen.storyboard */ = {
@@ -237,7 +237,7 @@
 			children = (
 				D2268F191F0ACFB1008EEFF0 /* Base */,
 			);
-			name = LaunchScreen.storyboard;
+			id = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -291,7 +291,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Debug;
+			id = Debug;
 		};
 		D2268F281F0ACFB2008EEFF0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -334,7 +334,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
-			name = Release;
+			id = Release;
 		};
 		D2268F2A1F0ACFB2008EEFF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -347,7 +347,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
-			name = Debug;
+			id = Debug;
 		};
 		D2268F2B1F0ACFB2008EEFF0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -360,7 +360,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
 			};
-			name = Release;
+			id = Release;
 		};
 		D2268F2D1F0ACFB2008EEFF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -374,7 +374,7 @@
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Configuration.app/Configuration";
 			};
-			name = Debug;
+			id = Debug;
 		};
 		D2268F2E1F0ACFB2008EEFF0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -388,7 +388,7 @@
 				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Configuration.app/Configuration";
 			};
-			name = Release;
+			id = Release;
 		};
 /* End XCBuildConfiguration section */
 
