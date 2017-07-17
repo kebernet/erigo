@@ -25,85 +25,75 @@ import java.util.zip.ZipEntry;
 
 /**
  * An implemention of an archive on the virtual file system.
- * 
+ *
  * @author J. Chris Folsom
  * @version 1.0
  * @since 1.0
  */
-class ImplArchive extends AbstractPathElement implements Archive
-{
-	private URL archive;
+class ImplArchive extends AbstractPathElement implements Archive {
+    private URL archive;
 
-	/**
-	 * Create a new archive on the file system.
-	 * 
-	 * @param parent
-	 *            the parent directory
-	 * @param archive
-	 *            the underlying archive
-	 */
-	ImplArchive(Container parent, URL archive)
-	{
-		super(parent);
-		this.archive = archive;
-	}
+    /**
+     * Create a new archive on the file system.
+     *
+     * @param parent  the parent directory
+     * @param archive the underlying archive
+     */
+    ImplArchive(Container parent, URL archive) {
+        super(parent);
+        this.archive = archive;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public URL getArchive()
-	{
-		return this.archive;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public URL getArchive() {
+        return this.archive;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<PathElement> getChildren() throws IOException
-	{
-		FileSystem fs = FileSystem.getInstance();
-		
-		JarInputStream in = new JarInputStream(this.archive.openStream());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<PathElement> getChildren() throws IOException {
+        FileSystem fs = FileSystem.getInstance();
 
-		List<PathElement> entries = new LinkedList<PathElement>();
+        JarInputStream in = new JarInputStream(this.archive.openStream());
 
-		for (ZipEntry entry = in.getNextJarEntry(); entry != null; entry = in
-				.getNextJarEntry())
-		{
-			entries.add(fs.getVirtualPath(this, entry));
-		}
+        List<PathElement> entries = new LinkedList<PathElement>();
 
-		in.close();
+        for (ZipEntry entry = in.getNextJarEntry(); entry != null; entry = in
+                .getNextJarEntry()) {
+            entries.add(fs.getVirtualPath(this, entry));
+        }
 
-		return entries;
-	}
+        in.close();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getName()
-	{
-		return this.archive.toString();
-	}
+        return entries;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getFullPath()
-	{
-		return this.archive.toString();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getName() {
+        return this.archive.toString();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public InputStream openStream() throws IOException
-	{
-		return this.archive.openStream();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFullPath() {
+        return this.archive.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InputStream openStream() throws IOException {
+        return this.archive.openStream();
+    }
 }

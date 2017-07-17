@@ -92,7 +92,7 @@ public class HttpClient {
 
     /**
      * Makes a get request.
-     *
+     * @param deviceName  Discovered name of the device for the url.
      * @param url      The URL to hit.
      * @param callback A callback with the result.
      */

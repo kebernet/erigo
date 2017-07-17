@@ -29,20 +29,25 @@ public class FileUtils {
     private static final File[] NO_FILES = new File[0];
 
 
-    public static List<String> listAllRelativeFilePaths(File parent){
-        return Arrays.stream(neverNull(parent.listFiles()))
-                .flatMap((file)->{
-                    if(file.isDirectory()){
-                        return Arrays.stream(neverNull(file.listFiles()));
-                    } else {
-                        return Stream.of(file);
-                    }
-                })
-                .map(file-> file.getAbsolutePath().substring(parent.getAbsolutePath().length() +1))
+    public static List<String> listAllRelativeFilePaths(File parent) {
+        return  recursiveList(parent)
+                .map(file -> file.getAbsolutePath().substring(parent.getAbsolutePath().length() + 1))
                 .collect(Collectors.toList());
     }
 
-    public static File[] neverNull(File[] array){
+    private static Stream<File> recursiveList(File parent) {
+        return Arrays.stream(neverNull(parent.listFiles()))
+            .flatMap((file)->{
+                if (file.isDirectory()) {
+                    return recursiveList(file);
+                } else {
+                    return Stream.of(file);
+                }
+            });
+    }
+
+
+    public static File[] neverNull(File[] array) {
         return array == null ? NO_FILES : array;
     }
 

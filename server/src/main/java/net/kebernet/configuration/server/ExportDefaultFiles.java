@@ -19,7 +19,6 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.pureperfect.ferret.Scanner;
 import com.pureperfect.ferret.vfs.Directory;
-import com.pureperfect.ferret.vfs.PathElement;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +27,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -44,36 +42,45 @@ public class ExportDefaultFiles {
     public ExportDefaultFiles(File settingsDirectory) throws IOException {
         this.settingsDirectory = settingsDirectory;
         this.classpathScanner.add(ExportDefaultFiles.class.getClassLoader());
-        if(!settingsDirectory.mkdirs()){
-            LOGGER.warning("Didn't mkdirs" +settingsDirectory.getAbsolutePath());
+        if (!settingsDirectory.mkdirs()) {
+            LOGGER.warning("Didn't mkdirs" + settingsDirectory.getAbsolutePath());
         }
+    }
+
+    public void exportFiles() throws IOException {
         writeFiles("/adhoc");
         writeFiles("/wifi");
         writeFiles("/configs");
-
     }
 
     private void writeFiles(String prefix) throws IOException {
-        for (String file : listResources(prefix)) {
-            File target = new File(this.settingsDirectory, prefix +"/" + file);
-            if (!target.getParentFile().mkdirs()) {
-                LOGGER.info("Didn't mkdirs " + target.getParentFile());
-            }
-            try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
-                CharStreams.copy(
-                        new InputStreamReader(WifiConfigWriter.class.getResourceAsStream(prefix +"/"+ file), Charsets.UTF_8),
-                        output);
-            }
-        }
+        listResources(prefix).parallelStream()
+                .forEach((file) -> {
+                    File target = new File(this.settingsDirectory, prefix + "/" + file);
+                    if (target.exists()) {
+                        return;
+                    }
+                    if (!target.getParentFile().mkdirs()) {
+                        LOGGER.info("Didn't mkdirs " + target.getParentFile());
+                    }
+                    try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
+                        CharStreams.copy(
+                                new InputStreamReader(WifiConfigWriter.class.getResourceAsStream(prefix + "/" + file), Charsets.UTF_8),
+                                output);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     List<String> listResources(String path) throws IOException {
-        Set<PathElement> paths = classpathScanner.scan(
-                (resource) -> {
-                    return resource.getFullPath().contains(path) && !(resource instanceof Directory);
-                });
-        return paths.stream()
-                .map( pe -> pe.getFullPath().substring(pe.getFullPath().indexOf(path) + path.length()))
+        return classpathScanner.scan(
+                (resource) ->
+                        resource.getFullPath().contains(path) &&
+                                !(resource instanceof Directory)
+        )
+                .stream()
+                .map(pe -> pe.getFullPath().substring(pe.getFullPath().indexOf(path) + path.length()))
                 .collect(Collectors.toList());
     }
 

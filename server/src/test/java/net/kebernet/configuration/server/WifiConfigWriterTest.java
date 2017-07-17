@@ -26,14 +26,21 @@ import java.util.logging.Logger;
 public class WifiConfigWriterTest {
     @Test
     public void adHocConfigTest() throws Exception {
-        File dir = new File("build/test/WifiConfigWriterTest");
+        if(System.getProperty("build.dir") == null){
+            throw new RuntimeException("No build dir");
+        }
+        File dir = new File(System.getProperty("build.dir")+"/test", WifiConfigWriterTest.class.getSimpleName());
+        File etc = new File(dir, "etc");
         if(!dir.mkdirs() || !dir.mkdir()){
             Logger.getAnonymousLogger().info("Didn't mkdir "+dir);
         }
+        new ExportDefaultFiles(etc).exportFiles();
         StartupParameters params = new StartupParameters();
+        params.setDeviceType("Unit Test Device");
         params.setcSubnet(26);
+        params.setStorageDirectory(etc.getAbsolutePath());
         params.setTargetDirectory(dir.getAbsolutePath());
-        WifiConfigWriter writer = new WifiConfigWriter("testDevice", params);
+        WifiConfigWriter writer = new WifiConfigWriter(params);
         writer.writeAdHocNetworkConfig();
     }
 

@@ -16,9 +16,10 @@
 package net.kebernet.configuration.server.model;
 
 import net.kebernet.configuration.client.model.Group;
+import net.kebernet.configuration.client.model.Setting;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -33,12 +34,14 @@ public class ConfigurationGroup {
     private List<String> templateFiles;
 
     public ConfigurationGroup() {
-        this.name = name;
-        this.settingsGroup = settingsGroup;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getBeforeScriptTemplate() {
@@ -61,6 +64,10 @@ public class ConfigurationGroup {
         return settingsGroup;
     }
 
+    public void setSettingsGroup(Group settingsGroup) {
+        this.settingsGroup = settingsGroup;
+    }
+
     public List<String> getTemplateFiles() {
         return templateFiles;
     }
@@ -69,11 +76,11 @@ public class ConfigurationGroup {
         this.templateFiles = templateFiles;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSettingsGroup(Group settingsGroup) {
-        this.settingsGroup = settingsGroup;
+    public boolean changesOnSetting(Set<String> settingNames) {
+        return getSettingsGroup()
+                .getSettings()
+                .stream()
+                .map(Setting::getName)
+                .anyMatch(settingNames::contains);
     }
 }

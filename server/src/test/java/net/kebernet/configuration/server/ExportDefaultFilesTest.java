@@ -35,14 +35,13 @@ public class ExportDefaultFilesTest {
         if(!settingsDirectory.mkdirs()){
             Logger.getAnonymousLogger().info("Didn't create "+settingsDirectory.getAbsolutePath());
         }
-        new ExportDefaultFiles(settingsDirectory);
+        new ExportDefaultFiles(settingsDirectory).exportFiles();
         for(String string : Arrays.asList(
                 "/configs/host/var/tmp/sethostname.sh",
                 "/configs/host/group.json",
                 "/configs/host/before.sh",
                 "/configs/host/after.sh")){
             File f = new File(settingsDirectory, string);
-            System.out.println(f.getAbsolutePath() +" "+f.exists());
             assertTrue("Exists: "+f.getAbsolutePath(), f.exists());
         }
 

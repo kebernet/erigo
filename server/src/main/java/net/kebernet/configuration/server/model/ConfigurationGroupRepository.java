@@ -24,35 +24,55 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 /**
  * Created by rcooper on 7/15/17.
  */
+@Singleton
 public class ConfigurationGroupRepository {
     private static final Logger LOGGER = Logger.getLogger(ConfigurationGroupRepository.class.getCanonicalName());
-    private final File settingsDirectory;
+    private final File storageDirectory;
     private final ArrayList<ConfigurationGroup> groups = new ArrayList<>();
 
-    public ConfigurationGroupRepository(File settingsDirectory){
-        this.settingsDirectory = settingsDirectory;
+    @Inject
+    public ConfigurationGroupRepository(@Named("storageDirectory") File storageDirectory) {
+        this.storageDirectory = storageDirectory;
     }
 
-    public void load() throws IOException {
-        File configs = new File(settingsDirectory, "configs");
-        if(configs.exists()){
-            if(!configs.getParentFile().mkdirs() || !configs.mkdir()){
-                LOGGER.warning("Failed to make directories "+configs.getAbsolutePath());
+    private static void ifFileExist(File parent, String f, Consumer<String> relativePath) {
+        File check = new File(parent, f);
+        if (check.exists()) {
+            relativePath.accept(f);
+        }
+    }
+
+    public synchronized void load() throws IOException {
+        groups.clear();
+        File configs = new File(storageDirectory, "configs");
+        if (configs.exists()) {
+            if (!configs.getParentFile().mkdirs() || !configs.mkdir()) {
+                LOGGER.warning("Failed to make directories " + configs.getAbsolutePath());
             }
         }
         File[] roots = configs.listFiles(File::isDirectory);
         roots = roots == null ? new File[0] : roots;
-        for(File f: roots) {
-            loadRoot(f);
+        for (File f : roots) {
+            groups.add(loadRoot(f));
         }
+        groups.sort(Comparator.comparingInt(o -> o.getSettingsGroup().getIndex()));
+    }
+
+    public List<ConfigurationGroup> getGroups() {
+        return groups;
     }
 
     ConfigurationGroup loadRoot(File f) throws FileNotFoundException {
@@ -70,18 +90,6 @@ public class ConfigurationGroupRepository {
         );
         return group;
     }
-
-
-
-    private static void ifFileExist(File parent, String f, Consumer<String> relativePath){
-        File check = new File(parent, f);
-        if(check.exists()){
-            relativePath.accept(f);
-        }
-    }
-
-
-
 
 
 }

@@ -17,19 +17,24 @@ package net.kebernet.configuration.server;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.io.Resources;
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
+
 import net.kebernet.configuration.server.http.GsonJerseyProvider;
 
+import java.util.logging.Logger;
+
+import dagger.ObjectGraph;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Environment;
+
 /**
- * Created by rcooper on 6/16/17.
+ * This is the main application class.
  */
 public class ConfigurationService extends Application<DropwizardConfiguration> {
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationService.class.getCanonicalName());
+    private final ObjectGraph graph;
 
-    private final StartupParameters parameters;
-
-    public ConfigurationService(StartupParameters parameters) {
-        this.parameters = parameters;
+    public ConfigurationService(ObjectGraph graph) {
+        this.graph = graph;
     }
 
     public static void main(String[] args) throws Exception {
@@ -38,7 +43,15 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
                 .addObject(parameters)
                 .build()
                 .parse(args);
-        new ConfigurationService(parameters)
+        LOGGER.info("Instantiating object graph.");
+        ObjectGraph graph = ObjectGraph.create(new ServerModule(parameters));
+
+        LOGGER.info("Exporting default files.");
+        graph.get(ExportDefaultFiles.class)
+                .exportFiles();
+
+        LOGGER.info("Starting web app.");
+        new ConfigurationService(graph)
                 .run(
                     parameters.getMode(),
                     Resources.getResource("server.yml").getPath()

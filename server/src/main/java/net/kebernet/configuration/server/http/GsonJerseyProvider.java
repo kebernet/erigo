@@ -15,6 +15,8 @@
  */
 package net.kebernet.configuration.server.http;
 
+import net.kebernet.configuration.client.impl.GsonFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,9 +55,9 @@ public class GsonJerseyProvider implements MessageBodyWriter<Object>, MessageBod
                            MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException {
 
-        try(InputStreamReader streamReader = new InputStreamReader(entityStream,
-                UTF_8);){
-            return GsonUtil.getInstance().fromJson(streamReader, genericType);
+        try (InputStreamReader streamReader = new InputStreamReader(entityStream,
+                UTF_8);) {
+            return GsonFactory.newInstance().fromJson(streamReader, genericType);
         } catch (com.google.gson.JsonSyntaxException e) {
             LOGGER.log(Level.WARNING, null, e);
         }
@@ -80,8 +82,8 @@ public class GsonJerseyProvider implements MessageBodyWriter<Object>, MessageBod
                         MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException,
             WebApplicationException {
-        try(OutputStreamWriter writer = new OutputStreamWriter(entityStream, UTF_8);) {
-            GsonUtil.getInstance().toJson(object, genericType, writer);
+        try (OutputStreamWriter writer = new OutputStreamWriter(entityStream, UTF_8);) {
+            GsonFactory.newInstance().toJson(object, genericType, writer);
         }
     }
 }

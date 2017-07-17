@@ -7,5 +7,5 @@ iface {{wlanInterface}} inet static
   address 192.168.{{cSubnet}}.1
   netmask 255.255.255.0
   wireless-channel 1
-  wireless-essid {{deviceName}}
+  wireless-essid {{networkName}}
   wireless-mode ad-hoc

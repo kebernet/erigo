@@ -21,18 +21,28 @@ import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Charsets;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Created by rcooper on 6/13/17.
  */
+@Singleton
 public class WifiConfigWriter {
     private static final Logger LOGGER = Logger.getLogger(WifiConfigWriter.class.getCanonicalName());
     private final MustacheFactory factory = new DefaultMustacheFactory();
@@ -40,25 +50,43 @@ public class WifiConfigWriter {
     private final String targetDirectory;
     private final String settingsDirectory;
 
-    public WifiConfigWriter(String deviceName, StartupParameters startupParameters) {
-        renderContext.put("deviceName", deviceName);
+    @Inject
+    public WifiConfigWriter(StartupParameters startupParameters) {
+        renderContext.put("deviceName", startupParameters.getDeviceType());
         renderContext.put("wlanInterface", startupParameters.getWlanInterface());
         renderContext.put("cSubnet", startupParameters.getcSubnet());
         renderContext.put("deviceType", startupParameters.getDeviceType());
+        String postFix = "UNKNOWN";
+        try {
+            byte[] mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
+            postFix = Integer.toHexString(mac[mac.length - 2]) +
+                    Integer.toHexString(mac[mac.length - 1]);
+        } catch (UnknownHostException | SocketException e) {
+            LOGGER.log(Level.WARNING, "Failed to get MAC address.", e);
+        }
+        String networkName = startupParameters.getDeviceType()+"-"+postFix;
+        if(networkName.contains(" ")){
+            networkName = "'"+networkName+"'";
+        }
+        renderContext.put( "networkName", networkName);
         this.targetDirectory = startupParameters.getTargetDirectory();
         this.settingsDirectory = startupParameters.getStorageDirectory();
     }
 
 
     public void writeAdHocNetworkConfig() throws IOException {
-        for(String file : FileUtils.listAllRelativeFilePaths(new File(settingsDirectory, "/adhoc"))){
+        File adHocTemplateFolder  = new File(settingsDirectory, "/adhoc");
+        for (String file : FileUtils.listAllRelativeFilePaths(adHocTemplateFolder)) {
+            File source = new File(adHocTemplateFolder, file);
             File target = new File(targetDirectory, file);
-            if(!target.getParentFile().mkdirs()){
-                LOGGER.info("Didn't mkdirs "+target.getParentFile());
+            if (!target.getParentFile().mkdirs()) {
+                LOGGER.info("Didn't mkdirs " + target.getParentFile());
             }
-            try(Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
+
+            LOGGER.info("Transforming from "+source.getAbsolutePath()+" to "+target.getAbsolutePath());
+            try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
                 Mustache mustache = factory.compile(
-                        new InputStreamReader(WifiConfigWriter.class.getResourceAsStream("/adhoc" + file), Charsets.UTF_8)
+                        new InputStreamReader(new FileInputStream(source), Charsets.UTF_8)
                         , file);
 
                 mustache.execute(output, renderContext);
@@ -66,7 +94,6 @@ public class WifiConfigWriter {
             }
         }
     }
-
 
 
 }

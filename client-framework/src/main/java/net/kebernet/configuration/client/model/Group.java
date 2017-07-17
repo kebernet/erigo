@@ -29,6 +29,7 @@ public class Group {
     private String name;
     private String description;
     private List<Setting> settings = new ArrayList<>();
+    private boolean requiresReboot;
 
     public int getIndex() {
         return index;
@@ -60,5 +61,38 @@ public class Group {
 
     public void setSettings(List<Setting> settings) {
         this.settings = settings;
+    }
+
+    public boolean isRequiresReboot() {
+        return requiresReboot;
+    }
+
+    public void setRequiresReboot(boolean requiresReboot) {
+        this.requiresReboot = requiresReboot;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (index != group.index) return false;
+        if (requiresReboot != group.requiresReboot) return false;
+        if (name != null ? !name.equals(group.name) : group.name != null) return false;
+        if (description != null ? !description.equals(group.description) : group.description != null)
+            return false;
+        return settings != null ? settings.equals(group.settings) : group.settings == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = index;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (settings != null ? settings.hashCode() : 0);
+        result = 31 * result + (requiresReboot ? 1 : 0);
+        return result;
     }
 }

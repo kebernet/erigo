@@ -16,7 +16,6 @@
 package net.kebernet.configuration.server;
 
 import com.beust.jcommander.Parameter;
-import org.jboss.logging.Param;
 
 /**
  * Created by rcooper on 6/13/17.
@@ -27,21 +26,21 @@ public class StartupParameters {
             "two characters of the MAC address.")
     private String deviceType;
 
-    @Parameter(names= {"-c", "--c-subnet"}, description = "The class C subnet below 192.168.X.* that it will create for " +
+    @Parameter(names = {"-c", "--c-subnet"}, description = "The class C subnet below 192.168.X.* that it will create for " +
             "ad-hoc networking. (1)")
     private int cSubnet = 1;
 
-    @Parameter(names= {"-d", "--target-directory"}, description = "The root target directory to write configuration files to. (/)")
+    @Parameter(names = {"-d", "--target-directory"}, description = "The root target directory to write configuration files to. (/)")
     private String targetDirectory = "/";
 
-    @Parameter(names={"-s", "--settings-directory"}, description = "The directory to store values to relative to the target directory (/etc/erigo)")
+    @Parameter(names = {"-s", "--settings-directory"}, description = "The directory to store values to relative to the target directory (/etc/erigo)")
     private String storageDirectory = "etc/erigo";
 
 
-    @Parameter(names= {"-i", "--interface"}, description = "The wifi interface to manage (wlan0)")
+    @Parameter(names = {"-i", "--interface"}, description = "The wifi interface to manage (wlan0)")
     private String wlanInterface = "wlan0";
 
-    @Parameter(names="-m", description = "mode")
+    @Parameter(names = "-m", description = "mode")
     private String mode;
 
     public String getDeviceType() {

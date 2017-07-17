@@ -19,10 +19,10 @@
  * in this package beyond knowing how to tell the difference between a zip file
  * and a class file or directory. Underlying resources on the file system or on
  * the network will be mapped to one of the following VFS types:
- * 
+ * <p>
  * <style> .mytable { border: 1px solid black; border-collapse: collapse;
  * text-align: center; } </style>
- * 
+ * <p>
  * <table class="mytable" style="width: 50%;">
  * <tr>
  * <th class="mytable">Actual Resource</th>
@@ -92,8 +92,8 @@
  * <td class="mytable">{@link ClassFile}</td>
  * </tr>
  * </table>
- * 
- * @since 1.0
+ *
  * @author J. Chris Folsom
+ * @since 1.0
  */
 package com.pureperfect.ferret.vfs;

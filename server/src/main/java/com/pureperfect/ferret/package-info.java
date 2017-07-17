@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 /**
- * Ferret class path scanning API. 
- * 
+ * Ferret class path scanning API.
+ *
  * @author J. Chris Folsom
  * @since 1.0
  */

@@ -27,11 +27,11 @@ public class WifiSwitcher {
     }
 
 
-    public void runAdHocNetwork(){
+    public void runAdHocNetwork() {
 
     }
 
-    public void runWifiNetwork(){
+    public void runWifiNetwork() {
 
     }
 

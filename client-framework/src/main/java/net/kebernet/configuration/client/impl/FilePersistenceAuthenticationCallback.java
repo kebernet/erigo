@@ -19,8 +19,6 @@ package net.kebernet.configuration.client.impl;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,6 +37,9 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * This is a wrapper for AuthenticationCallback that will use a local properties file to store creds by
  * scheme host and port.
@@ -54,7 +55,7 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
     /**
      * A new constructor
      *
-     * @param deviceName
+     * @param deviceName The resolved name of the device
      * @param propertiesFile The props file to (maybe) read from
      * @param nestedCallback the callback to wrap with persistence.
      * @throws IOException That is a thing that might happen.
