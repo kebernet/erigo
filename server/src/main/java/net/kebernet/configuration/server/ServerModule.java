@@ -29,7 +29,7 @@ import dagger.Provides;
 
 @Module(
         injects = {
-                ExportDefaultFiles.class
+                DefaultFileExporter.class
         }, library =  true
 )
 public class ServerModule {

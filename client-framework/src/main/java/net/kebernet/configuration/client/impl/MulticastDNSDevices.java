@@ -24,15 +24,14 @@ import net.kebernet.configuration.client.service.DiscoveryService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -49,6 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Created by rcooper on 7/4/17.
  */
 @GwtIncompatible
+@Singleton
 public class MulticastDNSDevices implements DiscoveryService {
     public static final String MDNS_SERVICE_TYPE = "_v1._iotconfig._tcp.local.";
     private static final Logger LOGGER = Logger.getLogger(MulticastDNSDevices.class.getCanonicalName());
@@ -62,9 +62,11 @@ public class MulticastDNSDevices implements DiscoveryService {
     private CopyOnWriteArrayList<Device> queuedForDispatch = new CopyOnWriteArrayList<>();
     private ErrorCallback errorCallback;
     private ServiceListener serviceListener;
+    private final HttpClient httpClient;
 
-    public MulticastDNSDevices(){
-
+    @Inject
+    public MulticastDNSDevices(HttpClient httpClient){
+        this.httpClient = httpClient;
     }
 
     @Override
@@ -162,27 +164,20 @@ public class MulticastDNSDevices implements DiscoveryService {
     private void queryDeviceInfo(final ServiceInfo info) {
         DEFAULT_EXECUTOR.submit(() -> {
             for (String url : info.getURLs()) {
-                try {
                     LOGGER.info("Fetching "+url);
-                    URL jnUrl = new URL(url);
-                    HttpURLConnection connection = (HttpURLConnection) jnUrl.openConnection();
-                    int code = connection.getResponseCode();
-                    String body = null;
-                    if(code != 200){
-                        maybeSendError("Unexpected response "+code+" from "+url);
-                        throw new IOException("Unexpected response code: "+code+"\n"+body);
-                    }
-                    body = CharStreams.toString(new InputStreamReader(connection.getInputStream()));
-                    Device device = new Gson().fromJson(body, Device.class);
-                    device.setName(info.getName());
-                    device.setAddress(url);
-                    saveService(info.getName(), device);
-
-                } catch (IOException e) {
-                    String error = "Failed to get URL("+url+") for name("+info.getName()+")";
-                    LOGGER.log(Level.WARNING, error, e);
-                    maybeSendError(error);
-                }
+                    httpClient.getToStream(info.getName(), url, (inputStreamReader -> {
+                        try {
+                            String body = CharStreams.toString(inputStreamReader);
+                            Device device = new Gson().fromJson(body, Device.class);
+                            device.setName(info.getName());
+                            device.setAddress(url);
+                            saveService(info.getName(), device);
+                        } catch (IOException e) {
+                            String error = "Failed to get URL("+url+") for name("+info.getName()+")";
+                            LOGGER.log(Level.WARNING, error, e);
+                            maybeSendError(error);
+                        }
+                    }));
             }
         });
     }

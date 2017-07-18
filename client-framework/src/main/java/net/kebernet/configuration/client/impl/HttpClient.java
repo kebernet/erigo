@@ -55,6 +55,7 @@ public class HttpClient {
 
     @Inject
     public HttpClient(){
+       System.out.println("HttpClient");
     }
 
 

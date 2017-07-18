@@ -31,11 +31,11 @@ public class ExportDefaultFilesTest {
 
     @Test
     public void testWriteDefaults() throws IOException {
-        File settingsDirectory = new File(System.getProperty("build.dir")+"/test", ExportDefaultFiles.class.getSimpleName());
+        File settingsDirectory = new File(System.getProperty("build.dir")+"/test", DefaultFileExporter.class.getSimpleName());
         if(!settingsDirectory.mkdirs()){
             Logger.getAnonymousLogger().info("Didn't create "+settingsDirectory.getAbsolutePath());
         }
-        new ExportDefaultFiles(settingsDirectory).exportFiles();
+        new DefaultFileExporter(settingsDirectory).exportMissingFiles();
         for(String string : Arrays.asList(
                 "/configs/host/var/tmp/sethostname.sh",
                 "/configs/host/group.json",

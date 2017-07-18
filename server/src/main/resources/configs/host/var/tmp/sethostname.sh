@@ -19,5 +19,5 @@
 echo {{host_name}} > {{erigo.targetDirectory}}/boot/hostnames
 echo {{host_name}} > {{erigo.targetDirectory}}/etc/erigo/devicename
 hostname {{host_name}}
-mv {{erigo.targetDirectory}}/keystore.jks {{erigo.targetDirectory}}/keystore.jks.backup-`date +%F`
-keytool -genkey -dname "CN={{hostname}}, OU=Erigo, O=Raspberry Pi, L=Atlanta, ST=GA, C=US" -ext SAN=oid:{{host_name}}, dns:{{host_name}},dns:{{host_name}}.local,ip:{{erigo.hostAddress}},ip:127.0.0.1,dns:localhost -alias default -validity 9999 -keyalg RSA -keystore {{erigo.targetDirectory}}/keystore.jks -keypass erigo -storepass erigo
+mv {{erigo.storageDirectory}}/keystore.jks {{erigo.storageDirectory}}/keystore.jks.backup-`date +%F`
+keytool -genkey -dname "CN={{hostname}}, OU=Erigo, O=Raspberry Pi, L=Atlanta, ST=GA, C=US" -ext SAN=oid:{{host_name}}, dns:{{host_name}},dns:{{host_name}}.local,ip:{{erigo.hostAddress}},ip:127.0.0.1,dns:localhost -alias default -validity 9999 -keyalg RSA -keystore {{erigo.storageDirectory}}/keystore.jks -keypass erigo -storepass erigo

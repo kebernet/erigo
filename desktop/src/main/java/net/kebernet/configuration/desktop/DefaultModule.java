@@ -26,9 +26,11 @@ import net.kebernet.configuration.client.service.CompositeDiscoveryService;
 import net.kebernet.configuration.client.service.DiscoveryService;
 import net.kebernet.configuration.client.service.SettingsService;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
+ * Dagger Module.
  * Created by rcooper on 7/7/17.
  */
 @Module(
@@ -38,19 +40,15 @@ import javax.inject.Singleton;
 )
 public class DefaultModule {
 
-    private final HttpClient client = new HttpClient();
-
     @Provides
     @Singleton
-    public DiscoveryService devices(){
-        return new CompositeDiscoveryService(new MulticastDNSDevices(), new SerialPortDevices());
+    public DiscoveryService devices(HttpClient client){
+        return new CompositeDiscoveryService(new MulticastDNSDevices(client), new SerialPortDevices());
     }
 
-
-
     @Provides
     @Singleton
-    public SettingsService settings(){
+    public SettingsService settings(HttpClient client){
         return new HttpDeviceSettings(client);
     }
 

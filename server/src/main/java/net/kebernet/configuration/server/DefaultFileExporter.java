@@ -31,29 +31,30 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
+ * This class scans the classpath and writes the packaged template files to the filesystem.
  * Created by rcooper on 7/15/17.
  */
-public class ExportDefaultFiles {
-    private static final Logger LOGGER = Logger.getLogger(ExportDefaultFiles.class.getCanonicalName());
+public class DefaultFileExporter {
+    private static final Logger LOGGER = Logger.getLogger(DefaultFileExporter.class.getCanonicalName());
     private final File settingsDirectory;
 
     private final Scanner classpathScanner = new Scanner();
 
-    public ExportDefaultFiles(File settingsDirectory) throws IOException {
+    public DefaultFileExporter(File settingsDirectory) throws IOException {
         this.settingsDirectory = settingsDirectory;
-        this.classpathScanner.add(ExportDefaultFiles.class.getClassLoader());
+        this.classpathScanner.add(DefaultFileExporter.class.getClassLoader());
         if (!settingsDirectory.mkdirs()) {
             LOGGER.warning("Didn't mkdirs" + settingsDirectory.getAbsolutePath());
         }
     }
 
-    public void exportFiles() throws IOException {
-        writeFiles("/adhoc");
-        writeFiles("/wifi");
-        writeFiles("/configs");
+    public void exportMissingFiles() throws IOException {
+        writeMissingFiles("/adhoc");
+        writeMissingFiles("/wifi");
+        writeMissingFiles("/configs");
     }
 
-    private void writeFiles(String prefix) throws IOException {
+    private void writeMissingFiles(String prefix) throws IOException {
         listResources(prefix).parallelStream()
                 .forEach((file) -> {
                     File target = new File(this.settingsDirectory, prefix + "/" + file);

@@ -25,6 +25,15 @@ public class SettingValue {
     private String name;
     private String value;
 
+    public SettingValue(){
+
+    }
+
+    public SettingValue(String name, String value){
+        this.name = name;
+        this.value = value;
+    }
+
     public String getName() {
         return name;
     }

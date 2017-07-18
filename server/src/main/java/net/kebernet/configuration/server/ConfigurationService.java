@@ -47,8 +47,8 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
         ObjectGraph graph = ObjectGraph.create(new ServerModule(parameters));
 
         LOGGER.info("Exporting default files.");
-        graph.get(ExportDefaultFiles.class)
-                .exportFiles();
+        graph.get(DefaultFileExporter.class)
+                .exportMissingFiles();
 
         LOGGER.info("Starting web app.");
         new ConfigurationService(graph)

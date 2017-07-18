@@ -22,4 +22,4 @@ if [ $retval -ne 0 ]; then
     echo "Failed to set the hostname $retval"
     exit -1
 fi
-shutdown -r now
+

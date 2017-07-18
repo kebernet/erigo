@@ -34,7 +34,7 @@ public class WifiConfigWriterTest {
         if(!dir.mkdirs() || !dir.mkdir()){
             Logger.getAnonymousLogger().info("Didn't mkdir "+dir);
         }
-        new ExportDefaultFiles(etc).exportFiles();
+        new DefaultFileExporter(etc).exportMissingFiles();
         StartupParameters params = new StartupParameters();
         params.setDeviceType("Unit Test Device");
         params.setcSubnet(26);

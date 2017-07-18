@@ -22,6 +22,11 @@
       "id": "host_name",
       "name": "Name",
       "validationExpression": "^[a-zA-Z1-9]*$"
+    },
+    {
+      "id": "host_thumbnailUrl",
+      "name": "Thumbnail URL",
+      "validationExpression": "^http(s?)://.*$"
     }
   ]
 

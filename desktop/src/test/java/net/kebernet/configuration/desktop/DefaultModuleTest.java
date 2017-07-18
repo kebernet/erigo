@@ -13,20 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.server;
+package net.kebernet.configuration.desktop;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import dagger.ObjectGraph;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by rcooper on 7/6/17.
+ * Created by rcooper on 7/18/17.
  */
-@Path("/settings")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class SettingsResource {
+public class DefaultModuleTest {
 
+    @Test
+    public void testModule(){
+        ObjectGraph graph = ObjectGraph.create(new DefaultModule());
+        AppFlowImpl impl = graph.get(AppFlowImpl.class);
+    }
 
 }

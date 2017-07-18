@@ -18,7 +18,6 @@ package net.kebernet.configuration.client.model;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.j2objc.annotations.ReflectionSupport;
-import net.kebernet.configuration.client.util.URIUtil;
 
 import java.util.List;
 

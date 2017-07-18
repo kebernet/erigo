@@ -15,47 +15,52 @@
  */
 package net.kebernet.configuration.server;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-import com.google.common.base.Charsets;
+import net.kebernet.configuration.client.model.SettingValue;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
+ * A special case config writer for dealing with Wifi settings.
  * Created by rcooper on 6/13/17.
  */
 @Singleton
-public class WifiConfigWriter {
-    private static final Logger LOGGER = Logger.getLogger(WifiConfigWriter.class.getCanonicalName());
-    private final MustacheFactory factory = new DefaultMustacheFactory();
-    private final Map<String, Object> renderContext = new HashMap<>();
-    private final String targetDirectory;
-    private final String settingsDirectory;
+public class WifiConfigWriter extends ConfigWriter {
 
     @Inject
     public WifiConfigWriter(StartupParameters startupParameters) {
+        super(new File(startupParameters.getTargetDirectory()), new File(startupParameters.getStorageDirectory()));
         renderContext.put("deviceName", startupParameters.getDeviceType());
         renderContext.put("wlanInterface", startupParameters.getWlanInterface());
         renderContext.put("cSubnet", startupParameters.getcSubnet());
         renderContext.put("deviceType", startupParameters.getDeviceType());
+        String networkName = computeDefaultName(startupParameters)+".erigo";
+        renderContext.put( "networkName", networkName);
+    }
+
+
+    public void writeAdHocNetworkConfig() throws IOException {
+        transformAndWrite(new File(storageDirectory, "/adhoc"), targetDirectory);
+    }
+
+    public void writeRegularNetworkConfig(List<SettingValue> settingValueList) throws IOException {
+        settingValueList.forEach((v)->{
+            renderContext.put(v.getName(), v.getValue());
+        });
+        transformAndWrite(new File(storageDirectory, "/wifi"), targetDirectory);
+    }
+
+
+
+    public static String computeDefaultName(StartupParameters startupParameters){
         String postFix = "UNKNOWN";
         try {
             NetworkInterface networkInterface = NetworkInterface.getByName(startupParameters.getWlanInterface());
@@ -68,33 +73,7 @@ public class WifiConfigWriter {
         } catch (UnknownHostException | SocketException e) {
             LOGGER.log(Level.WARNING, "Failed to get MAC address.", e);
         }
-        String networkName = startupParameters.getDeviceType()+"-"+postFix+".erigo";
-        renderContext.put( "networkName", networkName);
-        this.targetDirectory = startupParameters.getTargetDirectory();
-        this.settingsDirectory = startupParameters.getStorageDirectory();
+        return startupParameters.getDeviceType()+"-"+postFix;
     }
-
-
-    public void writeAdHocNetworkConfig() throws IOException {
-        File adHocTemplateFolder  = new File(settingsDirectory, "/adhoc");
-        for (String file : FileUtils.listAllRelativeFilePaths(adHocTemplateFolder)) {
-            File source = new File(adHocTemplateFolder, file);
-            File target = new File(targetDirectory, file);
-            if (!target.getParentFile().mkdirs()) {
-                LOGGER.info("Didn't mkdirs " + target.getParentFile());
-            }
-
-            LOGGER.info("Transforming from "+source.getAbsolutePath()+" to "+target.getAbsolutePath());
-            try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
-                Mustache mustache = factory.compile(
-                        new InputStreamReader(new FileInputStream(source), Charsets.UTF_8)
-                        , file);
-
-                mustache.execute(output, renderContext);
-                output.close();
-            }
-        }
-    }
-
 
 }
