@@ -15,11 +15,10 @@
  */
 package com.pureperfect.ferret.vfs;
 
+import javax.servlet.ServletContext;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.servlet.ServletContext;
 
 /**
  * Implementation of a class file in WEB-INF/classes.

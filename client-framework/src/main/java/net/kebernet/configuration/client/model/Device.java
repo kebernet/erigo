@@ -18,8 +18,10 @@ package net.kebernet.configuration.client.model;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.j2objc.annotations.ReflectionSupport;
+import io.swagger.annotations.ApiModelProperty;
 import net.kebernet.configuration.client.util.URIUtil;
 
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.logging.Logger;
 
 /**
@@ -38,6 +40,7 @@ public class Device {
     private String webUiUrl;
     private String tlsCertificateUrl;
 
+    @ApiModelProperty(hidden = true)
     public String getAddress() {
         return address;
     }
@@ -46,6 +49,7 @@ public class Device {
         this.address = address;
     }
 
+    @ApiModelProperty(value = "The name of the device")
     public String getName() {
         return name;
     }
@@ -54,6 +58,7 @@ public class Device {
         this.name = name;
     }
 
+    @ApiModelProperty(value = "The type of the device")
     public String getType() {
         return type;
     }
@@ -62,6 +67,7 @@ public class Device {
         this.type = type;
     }
 
+    @ApiModelProperty(value = "The manufacturer of the device")
     public String getManufacturer() {
         return manufacturer;
     }
@@ -70,6 +76,7 @@ public class Device {
         this.manufacturer = manufacturer;
     }
 
+    @ApiModelProperty(value = "URL to a thumbnail/icon for the device. May be a relative path.")
     public String getThumbnailUrl() {
         return URIUtil.resolveRelativeURI(this.getAddress(), this.thumbnailUrl);
     }
@@ -78,6 +85,7 @@ public class Device {
         this.thumbnailUrl = thumbnailUrl;
     }
 
+    @ApiModelProperty(value = "URL to a thumbnail/icon for the device. May be a relative path.")
     public String getSettingsUrl() {
         return URIUtil.resolveRelativeURI(this.getAddress(), this.settingsUrl);
     }
@@ -86,6 +94,7 @@ public class Device {
         this.settingsUrl = settingsUrl;
     }
 
+    @ApiModelProperty(value = "URL to a settings endpoint of the device. May be a relative path.")
     public String getSettingsValuesUrl() {
         return URIUtil.resolveRelativeURI(this.getAddress(), settingsValuesUrl);
     }
@@ -94,6 +103,7 @@ public class Device {
         this.settingsValuesUrl = settingsValuesUrl;
     }
 
+    @ApiModelProperty(value = "Optional: If the device has a web ui for administration, URL here. May be a relative path.")
     public String getWebUiUrl() {
         return URIUtil.resolveRelativeURI(this.getAddress(), webUiUrl);
     }
@@ -102,6 +112,7 @@ public class Device {
         this.webUiUrl = webUiUrl;
     }
 
+    @ApiModelProperty(value = "Optional: URL to the TLS certificate for the device.. May be a relative path.")
     public String getTlsCertificateUrl() {
         return tlsCertificateUrl;
     }

@@ -16,6 +16,7 @@
 package net.kebernet.configuration.server.model;
 
 import net.kebernet.configuration.server.DefaultFileExporter;
+import net.kebernet.configuration.server.StartupParameters;
 import org.junit.Test;
 
 import java.io.File;
@@ -42,8 +43,9 @@ public class ConfigurationGroupRepositoryTest {
         if (!dir.mkdirs() || !dir.mkdir()) {
             Logger.getAnonymousLogger().info("Didn't mkdir " + dir);
         }
+
         //Write files.
-        new DefaultFileExporter(etc).exportMissingFiles();
+        new DefaultFileExporter(etc, new StartupParameters()).exportMissingFiles();
         ConfigurationGroupRepository repository = new ConfigurationGroupRepository(etc);
         assertTrue(repository.load());
         List<ConfigurationGroup> groups = repository.getGroups();

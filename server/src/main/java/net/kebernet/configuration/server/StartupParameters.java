@@ -23,8 +23,8 @@ import com.beust.jcommander.Parameter;
 public class StartupParameters {
 
     @Parameter(names = {"-d", "--device-type"}, description = "The name of the device. Will be postfixed with the last " +
-            "two characters of the MAC address.")
-    private String deviceType;
+            "two characters of the MAC address. (RaspberryPi)")
+    private String deviceType = "RaspberryPi";
 
     @Parameter(names = {"-c", "--c-subnet"}, description = "The class C subnet below 192.168.X.* that it will create for " +
             "ad-hoc networking. (1)")
@@ -40,8 +40,12 @@ public class StartupParameters {
     @Parameter(names = {"-i", "--interface"}, description = "The wifi interface to manage (wlan0)")
     private String wlanInterface = "wlan0";
 
-    @Parameter(names = "-m", description = "mode")
-    private String mode;
+    @Parameter(names = "-m", description = "Toggle for the drop wizzard configuration. (server)")
+    private String mode = "server";
+
+    @Parameter(names ="--network-match", description = "A Regular expression to match network addresses that should be" +
+            "allowed to talk to the service")
+    private String hostMatchRegex;
 
     public String getDeviceType() {
         return deviceType;
@@ -89,5 +93,13 @@ public class StartupParameters {
 
     public void setStorageDirectory(String storageDirectory) {
         this.storageDirectory = storageDirectory;
+    }
+
+    public String getHostMatchRegex() {
+        return hostMatchRegex;
+    }
+
+    public void setHostMatchRegex(String hostMatchRegex) {
+        this.hostMatchRegex = hostMatchRegex;
     }
 }

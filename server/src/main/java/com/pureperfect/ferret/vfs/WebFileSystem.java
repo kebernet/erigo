@@ -17,10 +17,9 @@ package com.pureperfect.ferret.vfs;
 
 import com.pureperfect.ferret.ScanException;
 
+import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.servlet.ServletContext;
 
 /**
  * An implementation of a lightweight Virtual File System (VFS) appropriate for

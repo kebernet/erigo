@@ -17,14 +17,19 @@ package net.kebernet.configuration.server;
 
 import com.beust.jcommander.JCommander;
 import com.google.common.io.Resources;
-
-import net.kebernet.configuration.server.http.GsonJerseyProvider;
-
-import java.util.logging.Logger;
-
 import dagger.ObjectGraph;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import net.kebernet.configuration.server.endpoint.DeviceResource;
+import net.kebernet.configuration.server.endpoint.SettingsResource;
+import net.kebernet.configuration.server.http.GsonJerseyProvider;
+
+import java.io.File;
+import java.util.logging.Logger;
 
 /**
  * This is the main application class.
@@ -43,26 +48,46 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
                 .addObject(parameters)
                 .build()
                 .parse(args);
+        startup(parameters);
+    }
+
+    public static void startup(StartupParameters parameters) throws Exception{
         LOGGER.info("Instantiating object graph.");
         ObjectGraph graph = ObjectGraph.create(new ServerModule(parameters));
 
         LOGGER.info("Exporting default files.");
         graph.get(DefaultFileExporter.class)
                 .exportMissingFiles();
-
+        File storageDirectory = new File(parameters.getTargetDirectory(), parameters.getStorageDirectory());
+        String keystore =  new File(storageDirectory, "keystore.jks").getAbsolutePath();
+        LOGGER.info("Using Keystore: "+keystore);
+        System.getProperties().setProperty("dw.server.applicationConnectors[1].keyStorePath", keystore);
         LOGGER.info("Starting web app.");
-        new ConfigurationService(graph)
-                .run(
-                    parameters.getMode(),
-                    Resources.getResource("server.yml").getPath()
-                );
+        ConfigurationService service = new ConfigurationService(graph);
+        service.run(
+                parameters.getMode(),
+                Resources.getResource("server.yml").getPath()
+        );
+
     }
 
-
-
+    @Override
+    public void initialize(Bootstrap<DropwizardConfiguration> bootstrap) {
+        super.initialize(bootstrap);
+        bootstrap.addBundle( new AssetsBundle("/swaggerui/", "/doc/", "index.html"));
+    }
 
     @Override
     public void run(DropwizardConfiguration configuration, Environment environment) throws Exception {
         environment.jersey().register(GsonJerseyProvider.class);
+        environment.jersey().register(new ApiListingResource());
+        environment.jersey().register(graph.get(DeviceResource.class));
+        environment.jersey().register(graph.get(SettingsResource.class));
+
+        BeanConfig config = new BeanConfig();
+        config.setTitle("Erigo Configuration Service");
+        config.setVersion("1.0.0");
+        config.setResourcePackage(DeviceResource.class.getPackage().getName());
+        config.setScan(true);
     }
 }

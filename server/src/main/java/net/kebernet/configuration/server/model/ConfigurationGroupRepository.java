@@ -17,6 +17,7 @@ package net.kebernet.configuration.server.model;
 
 import net.kebernet.configuration.client.impl.GsonFactory;
 import net.kebernet.configuration.client.model.Group;
+import net.kebernet.configuration.client.model.SettingValue;
 import net.kebernet.configuration.server.FileUtils;
 
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -112,6 +114,17 @@ public class ConfigurationGroupRepository {
                 .collect(Collectors.toList())
         );
         return group;
+    }
+
+
+    public List<ConfigurationGroup> findGroupsNeedingExecutionForChanges(List<SettingValue> values) throws IOException {
+        load();
+        Set<String> settingNames = values.stream()
+                .map(SettingValue::getName)
+                .collect(Collectors.toSet());
+        return groups.parallelStream()
+                .filter(g-> g.changesOnSetting(settingNames))
+                .collect(Collectors.toList());
     }
 
 

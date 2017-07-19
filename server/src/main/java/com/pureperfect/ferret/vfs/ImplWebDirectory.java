@@ -15,12 +15,11 @@
  */
 package com.pureperfect.ferret.vfs;
 
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.ServletContext;
 
 /**
  * Implementation of a web directory.

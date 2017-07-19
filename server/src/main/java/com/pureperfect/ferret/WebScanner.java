@@ -17,9 +17,8 @@ package com.pureperfect.ferret;
 
 import com.pureperfect.ferret.vfs.WebFileSystem;
 
-import java.util.Set;
-
 import javax.servlet.ServletContext;
+import java.util.Set;
 
 /**
  * A Classpath scanner appropriate for scanning in a Java web application.

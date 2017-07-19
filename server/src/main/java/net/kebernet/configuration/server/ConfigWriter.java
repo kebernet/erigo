@@ -19,6 +19,8 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Charsets;
+import net.kebernet.configuration.client.model.SettingValue;
+import net.kebernet.configuration.server.model.ConfigurationGroup;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +33,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -46,12 +49,18 @@ public class ConfigWriter {
     protected final File storageDirectory;
     protected final File targetDirectory;
 
+
     @Inject
     public ConfigWriter(@Named("targetDirectory") File targetDirectory, @Named("storageDirectory") File storageDirectory){
         this.storageDirectory = storageDirectory;
         this.targetDirectory = targetDirectory;
         renderContext.put("erigo.targetDirectory", targetDirectory.getAbsolutePath());
         renderContext.put("erigo.storageDirectory", storageDirectory.getAbsolutePath());
+    }
+
+
+    public void executeApplyGroups(List<ConfigurationGroup> groups, List<SettingValue> settings){
+
     }
 
 

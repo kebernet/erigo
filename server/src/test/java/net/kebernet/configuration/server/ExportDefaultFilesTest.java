@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by rcooper on 7/17/17.
@@ -35,7 +35,7 @@ public class ExportDefaultFilesTest {
         if(!settingsDirectory.mkdirs()){
             Logger.getAnonymousLogger().info("Didn't create "+settingsDirectory.getAbsolutePath());
         }
-        new DefaultFileExporter(settingsDirectory).exportMissingFiles();
+        new DefaultFileExporter(settingsDirectory, new StartupParameters()).exportMissingFiles();
         for(String string : Arrays.asList(
                 "/configs/host/var/tmp/sethostname.sh",
                 "/configs/host/group.json",

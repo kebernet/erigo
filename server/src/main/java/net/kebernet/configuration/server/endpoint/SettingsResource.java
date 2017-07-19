@@ -15,13 +15,18 @@
  */
 package net.kebernet.configuration.server.endpoint;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import net.kebernet.configuration.client.model.SettingValue;
 import net.kebernet.configuration.client.model.Settings;
+import net.kebernet.configuration.server.ConfigWriter;
 import net.kebernet.configuration.server.model.ConfigurationGroup;
 import net.kebernet.configuration.server.model.ConfigurationGroupRepository;
 import net.kebernet.configuration.server.model.SettingValueRepository;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,32 +35,39 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Created by rcooper on 7/6/17.
  */
 
+@Singleton
 @Path("/settings")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Api(value = "/settings", description = "Managed device settings.")
 public class SettingsResource {
-
+    private static final Logger LOGGER = Logger.getLogger(SettingsResource.class.getCanonicalName());
     private final ConfigurationGroupRepository repository;
     private final SettingValueRepository values;
+    private final ConfigWriter configWriter;
 
     @Inject
-    public SettingsResource(ConfigurationGroupRepository repository, SettingValueRepository values) {
+    public SettingsResource(ConfigurationGroupRepository repository, SettingValueRepository values, ConfigWriter configWriter) {
         this.repository = repository;
         this.values = values;
+        this.configWriter = configWriter;
     }
 
 
     @GET
     public Settings getSettings() throws IOException {
         Settings settings = new Settings();
-        settings.setDescription("My Raspberry Pi");
-        repository.load();
+        settings.setDescription(values.findValue("host_description", ""));
+        if(repository.load()){
+            LOGGER.info("Reloaded configuration groups.");
+        }
         settings.setGroups(repository.getGroups()
             .stream()
             .map(ConfigurationGroup::getSettingsGroup)
@@ -65,8 +77,16 @@ public class SettingsResource {
 
     @GET
     @Path("/values")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "List the values",
+                    response = SettingValue.class,
+                    responseContainer = "List")
+    })
     public List<SettingValue> values() throws IOException {
-        values.load();
+        if(values.load()){
+            // TODO We should maybe re-apply here too?
+            LOGGER.info("Reloaded settings values.");
+        }
         return values.getValues();
     }
 
@@ -74,6 +94,9 @@ public class SettingsResource {
     @Path("/values")
     public void values(List<SettingValue> update) throws IOException {
         values.storeValues(update);
+        configWriter.executeApplyGroups(
+                repository.findGroupsNeedingExecutionForChanges(update),
+                values.getValues());
     }
 
 

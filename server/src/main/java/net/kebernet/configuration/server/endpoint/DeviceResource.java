@@ -15,6 +15,14 @@
  */
 package net.kebernet.configuration.server.endpoint;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Contact;
+import io.swagger.annotations.ExternalDocs;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.License;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Tag;
 import net.kebernet.configuration.client.model.Device;
 import net.kebernet.configuration.server.StartupParameters;
 import net.kebernet.configuration.server.WifiConfigWriter;
@@ -29,7 +37,32 @@ import javax.ws.rs.Path;
  * The Device information endpoint.
  * Created by rcooper on 7/18/17.
  */
+@SwaggerDefinition(
+        info = @Info(
+                description = "Gets the weather",
+                version = "V12.0.12",
+                title = "The Weather API",
+                termsOfService = "http://theweatherapi.io/terms.html",
+                contact = @Contact(
+                        name = "Robert Cooper",
+                        email = "kebernet@gmail.com",
+                        url = "http://www.kebernet.net"
+                ),
+                license = @License(
+                        name = "Apache 2.0",
+                        url = "http://www.apache.org/licenses/LICENSE-2.0"
+                )
+        ),
+        consumes = {"application/json"},
+        produces = {"application/json"},
+        schemes = {SwaggerDefinition.Scheme.HTTP, SwaggerDefinition.Scheme.HTTPS},
+        tags = {
+                @Tag(name = "Private", description = "Tag used to denote operations as private")
+        },
+        externalDocs = @ExternalDocs(value = "Ergio GitHub", url = "http://github.com/kebernet/erigo")
+)
 @Path("/device")
+@Api(value = "/device", description = "Returns the metadata about this device.")
 @Singleton
 public class DeviceResource {
     private static final String DEFAULT_ICON_URL = "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Raspberry_Pi_Logo.svg/810px-Raspberry_Pi_Logo.svg.png";
@@ -43,13 +76,17 @@ public class DeviceResource {
     }
 
     @GET
+    @ApiOperation(
+            value = "Retrieve the device information",
+            notes = "This information is immutable",
+            response = Device.class)
     public Device device(){
         Device value = new Device();
         value.setName(valueRepository.findValue("host_name", WifiConfigWriter.computeDefaultName(parameters)));
         value.setThumbnailUrl(valueRepository.findValue("host_thumbnailUrl", DEFAULT_ICON_URL));
         value.setSettingsUrl("/settings");
         value.setManufacturer(valueRepository.findValue("host_manufacturer", "Raspberry Pi"));
-        value.setThumbnailUrl(valueRepository.findValue("host_type", "Raspberry Pi"));
+        value.setType(valueRepository.findValue("host_type", "Raspberry Pi"));
         value.setWebUiUrl(valueRepository.findValue("host_webUiUrl", null));
         value.setTlsCertificateUrl(valueRepository.findValue("host_tlsCertificateUrl", null));
         value.setSettingsValuesUrl("/settings/values");

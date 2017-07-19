@@ -20,12 +20,19 @@ import com.google.common.io.CharStreams;
 import com.pureperfect.ferret.Scanner;
 import com.pureperfect.ferret.vfs.Directory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -39,9 +46,12 @@ public class DefaultFileExporter {
     private final File settingsDirectory;
 
     private final Scanner classpathScanner = new Scanner();
+    private final StartupParameters parameters;
 
-    public DefaultFileExporter(File settingsDirectory) throws IOException {
+    @Inject
+    public DefaultFileExporter(@Named("storageDirectory") File settingsDirectory, StartupParameters parameters) {
         this.settingsDirectory = settingsDirectory;
+        this.parameters = parameters;
         this.classpathScanner.add(DefaultFileExporter.class.getClassLoader());
         if (!settingsDirectory.mkdirs()) {
             LOGGER.warning("Didn't mkdirs" + settingsDirectory.getAbsolutePath());
@@ -52,6 +62,57 @@ public class DefaultFileExporter {
         writeMissingFiles("/adhoc");
         writeMissingFiles("/wifi");
         writeMissingFiles("/configs");
+        checkKeystore();
+    }
+
+    private void checkKeystore() {
+        File keystoreFile = new File(settingsDirectory, "keystore.jks");
+        if (!keystoreFile.exists()) {
+            String hostname = WifiConfigWriter.computeDefaultName(parameters);
+            String ip = "";
+            try {
+                for (byte b : InetAddress.getLocalHost().getAddress()) {
+                    if (ip.length() > 0) {
+                        ip += ".";
+                    }
+                    ip += Integer.toString(b & 0xFF);
+                }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
+            List<String> command = Arrays.asList(
+                    "keytool",
+                    "-genkey",
+                    "-dname",
+                    new StringBuilder("CN=")
+                            .append(hostname)
+                            .append(", OU=Erigo, O=Raspberry Pi, L=Atlanta, ST=GA, C=US").toString(),
+                    "-ext",
+                    new StringBuilder("SAN=dns:")
+                            .append(hostname).append(",dns:").append(hostname)
+                            .append(".local,ip:")
+                            .append(ip)
+                            .append(",ip:127.0.0.1,dns:localhost").toString(),
+                    "-alias",
+                    "default",
+                    "-validity", "9999", "-keyalg", "RSA", "-keysize", "2048", "-keystore", keystoreFile.getAbsolutePath(),
+                    "-storepass", "erigoerigo"
+                    );
+
+            LOGGER.info("Generating initial keystore with: " + command.toString());
+            try {
+                int result = new ProcessBuilder(command)
+                    .inheritIO()
+                    .start().waitFor();
+                LOGGER.info("Result "+result);
+                if(result != 0){
+                    throw new IllegalStateException("Bad result from generating keystore "+result);
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
     }
 
     private void writeMissingFiles(String prefix) throws IOException {

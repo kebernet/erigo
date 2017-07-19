@@ -21,12 +21,13 @@ import com.google.common.base.Objects;
 /**
  * Created by rcooper on 7/11/17.
  */
+
+
 public class SettingValue {
     private String name;
     private String value;
 
     public SettingValue(){
-
     }
 
     public SettingValue(String name, String value){

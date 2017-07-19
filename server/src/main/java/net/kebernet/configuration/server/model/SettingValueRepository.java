@@ -17,7 +17,6 @@ package net.kebernet.configuration.server.model;
 
 import com.google.common.base.Charsets;
 import net.kebernet.configuration.client.model.SettingValue;
-import net.kebernet.configuration.server.StartupParameters;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +34,9 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
+ *
+ * A repository that store settings to the settings.properties file in the storage directory.
+ *
  * Created by rcooper on 7/18/17.
  */
 @Singleton
@@ -43,20 +45,18 @@ public class SettingValueRepository {
     private final File storageDirectory;
     private final Properties properties = new Properties();
     private final File settingsFile;
-    private final StartupParameters params;
     private long lastRead = Long.MIN_VALUE;
 
     @Inject
-    public SettingValueRepository(@Named("storageDirectory") File storageDirectory, StartupParameters params) {
+    public SettingValueRepository(@Named("storageDirectory") File storageDirectory) {
         this.storageDirectory = storageDirectory;
         this.settingsFile = new File(storageDirectory, "settings.properties");
-        this.params = params;
 
     }
 
     public synchronized boolean load() throws IOException {
         File settingsFile = new File(storageDirectory, "settings.properties");
-        if (lastRead < settingsFile.lastModified()) {
+        if (settingsFile.exists() && lastRead < settingsFile.lastModified()) {
             properties.clear();
             try(Reader r = new InputStreamReader(new FileInputStream(settingsFile), Charsets.UTF_8)) {
                 properties.load(r);
@@ -89,7 +89,7 @@ public class SettingValueRepository {
         }
     }
 
-    public String findValue(String host_name, String defaultValue) {
-        return properties.getProperty(host_name, defaultValue);
+    public String findValue(String settingName, String defaultValue) {
+        return properties.getProperty(settingName, defaultValue);
     }
 }

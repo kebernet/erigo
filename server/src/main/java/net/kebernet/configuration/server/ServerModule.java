@@ -15,13 +15,14 @@
  */
 package net.kebernet.configuration.server;
 
-import java.io.File;
+import dagger.Module;
+import dagger.Provides;
+import net.kebernet.configuration.server.endpoint.DeviceResource;
+import net.kebernet.configuration.server.endpoint.SettingsResource;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import dagger.Module;
-import dagger.Provides;
+import java.io.File;
 
 /**
  * Created by rcooper on 7/17/17.
@@ -29,7 +30,9 @@ import dagger.Provides;
 
 @Module(
         injects = {
-                DefaultFileExporter.class
+                DefaultFileExporter.class,
+                DeviceResource.class,
+                SettingsResource.class
         }, library =  true
 )
 public class ServerModule {
@@ -43,8 +46,8 @@ public class ServerModule {
     @Provides
     @Named("storageDirectory")
     @Singleton
-    public File storageDirectory() {
-        return new File(parameters.getStorageDirectory());
+    public File storageDirectory(@Named("targetDirectory") File target) {
+        return new File(target, parameters.getStorageDirectory());
     }
 
     @Provides
@@ -58,5 +61,12 @@ public class ServerModule {
     @Singleton
     public StartupParameters parameters(){
         return parameters;
+    }
+
+    @Provides
+    @Singleton
+    @Named("hostMatchRegex")
+    public String hostMatchRegex(){
+        return parameters.getHostMatchRegex();
     }
 }
