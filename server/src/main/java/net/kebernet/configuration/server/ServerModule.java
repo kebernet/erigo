@@ -32,7 +32,8 @@ import java.io.File;
         injects = {
                 DefaultFileExporter.class,
                 DeviceResource.class,
-                SettingsResource.class
+                SettingsResource.class,
+                MulticastDNSService.class
         }, library =  true
 )
 public class ServerModule {
@@ -68,5 +69,12 @@ public class ServerModule {
     @Named("hostMatchRegex")
     public String hostMatchRegex(){
         return parameters.getHostMatchRegex();
+    }
+
+    @Provides
+    @Singleton
+    @Named("defaultDeviceName")
+    public String defaultDeviceName(){
+        return WifiConfigWriter.computeDefaultName(parameters);
     }
 }

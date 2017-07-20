@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server;
 
+import net.kebernet.configuration.server.model.SettingValueRepository;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,7 +35,7 @@ public class WifiConfigWriterTest {
         if(!dir.mkdirs() || !dir.mkdir()){
             Logger.getAnonymousLogger().info("Didn't mkdir "+dir);
         }
-        new DefaultFileExporter(etc, new StartupParameters()).exportMissingFiles();
+        new DefaultFileExporter(etc, new SettingValueRepository(etc, "testThing")).exportMissingFiles();
         StartupParameters params = new StartupParameters();
         params.setDeviceType("Unit Test Device");
         params.setcSubnet(26);

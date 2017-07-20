@@ -46,14 +46,15 @@ public class CertificateTool {
         this.trustStore = trustStore;
     }
 
-    public void addCertificatesForUrl(@Nonnull  String url) throws Exception {
-        addCertificatesToKeyStore(fetchCertificatesForUrl(url));
+    public boolean addCertificatesForUrl(@Nonnull String url) throws Exception {
+        return addCertificatesToKeyStore(fetchCertificatesForUrl(url));
     }
 
-    public void addCertificatesToKeyStore(@Nonnull List<X509Certificate> certificates) throws KeyStoreException {
+    public boolean addCertificatesToKeyStore(@Nonnull List<X509Certificate> certificates) throws KeyStoreException {
         for(X509Certificate c: certificates){
             trustStore.setCertificateEntry("imported-"+c.getSerialNumber(), c);
         }
+        return true;
     }
 
     public List<X509Certificate> fetchCertificatesForUrl(@Nonnull String aURL) throws Exception {
@@ -63,7 +64,7 @@ public class CertificateTool {
 
     public List<X509Certificate> fetchCertificatesForSocket(@Nonnull String host, int port) throws Exception {
         SSLContext context = SSLContext.getInstance("SSL");
-        TrustManager trustAllCerts =
+        TrustManager trustValidCerts =
             new X509TrustManager() {
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
@@ -90,7 +91,7 @@ public class CertificateTool {
                 }
             };
 
-        TrustManager[] tm = new TrustManager[]{trustAllCerts};
+        TrustManager[] tm = new TrustManager[]{trustValidCerts};
         context.init(new KeyManager[0], tm, new SecureRandom());
         SocketFactory factory =  context.getSocketFactory();
 

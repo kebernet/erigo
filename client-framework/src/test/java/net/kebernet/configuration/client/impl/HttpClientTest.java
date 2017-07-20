@@ -53,7 +53,7 @@ public class HttpClientTest {
 
     @Test
     public void testSimpleGet() throws Exception {
-        HttpClient client = new HttpClient();
+        HttpClient client = new HttpClient(null);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("localhost", "http://localhost:"+port+"/hello", (reader)->{
             try {
@@ -68,7 +68,7 @@ public class HttpClientTest {
 
     @Test
     public void testRedirectedGet() throws Exception {
-        HttpClient client = new HttpClient();
+        HttpClient client = new HttpClient(null);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("localhost", "http://localhost:"+port+"/helloRedirected", (reader)->{
             try {
@@ -83,7 +83,7 @@ public class HttpClientTest {
 
     @Test
     public void testPermanentRedirectedGet() throws Exception {
-        HttpClient client = new HttpClient();
+        HttpClient client = new HttpClient(null);
         SettableFuture<String> result = SettableFuture.create();
         client.getToStream("localhost", "http://localhost:"+port+"/helloRedirectedPermanent", (reader)->{
             try {
@@ -109,7 +109,7 @@ public class HttpClientTest {
     public void testAuthenticatedGet() throws Exception {
         String checkUrl = "http://localhost:"+port+"/authenticated";
         AtomicBoolean didAuth = new AtomicBoolean(false);
-        HttpClient client = new HttpClient();
+        HttpClient client = new HttpClient(null);
         client.setAuthenticationCallback((deviceName, url, previousToken, callback) -> {
             assertEquals(checkUrl, url);
             assertNull(previousToken);
@@ -137,7 +137,7 @@ public class HttpClientTest {
         AtomicBoolean didAuth = new AtomicBoolean(false);
         AtomicReference<String> error = new AtomicReference<>(null);
 
-        HttpClient client = new HttpClient();
+        HttpClient client = new HttpClient(null);
         clearCachedAuthentication();
         client.setErrorCallback(error::set);
         client.setAuthenticationCallback(((deviceName, url, previousToken, callback) -> {

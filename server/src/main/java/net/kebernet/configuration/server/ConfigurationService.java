@@ -26,9 +26,14 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import net.kebernet.configuration.server.endpoint.DeviceResource;
 import net.kebernet.configuration.server.endpoint.SettingsResource;
+import net.kebernet.configuration.server.http.CorsFilter;
 import net.kebernet.configuration.server.http.GsonJerseyProvider;
+import net.kebernet.configuration.server.http.PamFilter;
+import net.kebernet.configuration.server.http.RequireSslFilter;
 
+import javax.servlet.DispatcherType;
 import java.io.File;
+import java.util.EnumSet;
 import java.util.logging.Logger;
 
 /**
@@ -37,8 +42,10 @@ import java.util.logging.Logger;
 public class ConfigurationService extends Application<DropwizardConfiguration> {
     private static final Logger LOGGER = Logger.getLogger(ConfigurationService.class.getCanonicalName());
     private final ObjectGraph graph;
+    private final StartupParameters parameters;
 
-    public ConfigurationService(ObjectGraph graph) {
+    public ConfigurationService(StartupParameters parameters, ObjectGraph graph) {
+        this.parameters = parameters;
         this.graph = graph;
     }
 
@@ -63,7 +70,7 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
         LOGGER.info("Using Keystore: "+keystore);
         System.getProperties().setProperty("dw.server.applicationConnectors[1].keyStorePath", keystore);
         LOGGER.info("Starting web app.");
-        ConfigurationService service = new ConfigurationService(graph);
+        ConfigurationService service = new ConfigurationService(parameters, graph);
         service.run(
                 parameters.getMode(),
                 Resources.getResource("server.yml").getPath()
@@ -79,10 +86,23 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
 
     @Override
     public void run(DropwizardConfiguration configuration, Environment environment) throws Exception {
+        environment.servlets().addFilter("CrossOriginRequestFilter", new CorsFilter())
+                .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+        if(!parameters.isDontRequireSsl()){
+            environment.servlets().addFilter("RequireSslFilter", new RequireSslFilter())
+                    .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+        }
+        if(!parameters.isDontRequireLogin()){
+            environment.servlets().addFilter("PAMAuthenticationFilter", new PamFilter())
+                    .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+        }
+
+        graph.get(MulticastDNSService.class).start();
         environment.jersey().register(GsonJerseyProvider.class);
         environment.jersey().register(new ApiListingResource());
         environment.jersey().register(graph.get(DeviceResource.class));
         environment.jersey().register(graph.get(SettingsResource.class));
+
 
         BeanConfig config = new BeanConfig();
         config.setTitle("Erigo Configuration Service");

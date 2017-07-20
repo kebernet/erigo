@@ -40,12 +40,18 @@ public class StartupParameters {
     @Parameter(names = {"-i", "--interface"}, description = "The wifi interface to manage (wlan0)")
     private String wlanInterface = "wlan0";
 
-    @Parameter(names = "-m", description = "Toggle for the drop wizzard configuration. (server)")
+    @Parameter(names = "-m", description = "Toggle for the dropwizard configuration. (server)")
     private String mode = "server";
 
     @Parameter(names ="--network-match", description = "A Regular expression to match network addresses that should be" +
             "allowed to talk to the service")
     private String hostMatchRegex;
+
+    @Parameter(names = "--dont-require-login", description = "Prevents the HTTP service from requiring a login.")
+    private boolean dontRequireLogin = false;
+
+    @Parameter(names = "--dont-require-ssl", description = "Prevents the exposed URIs from redirecting to HTTPS.")
+    private boolean dontRequireSsl = false;
 
     public String getDeviceType() {
         return deviceType;
@@ -101,5 +107,21 @@ public class StartupParameters {
 
     public void setHostMatchRegex(String hostMatchRegex) {
         this.hostMatchRegex = hostMatchRegex;
+    }
+
+    public boolean isDontRequireLogin() {
+        return dontRequireLogin;
+    }
+
+    public void setDontRequireLogin(boolean dontRequireLogin) {
+        this.dontRequireLogin = dontRequireLogin;
+    }
+
+    public boolean isDontRequireSsl() {
+        return dontRequireSsl;
+    }
+
+    public void setDontRequireSsl(boolean dontRequireSsl) {
+        this.dontRequireSsl = dontRequireSsl;
     }
 }

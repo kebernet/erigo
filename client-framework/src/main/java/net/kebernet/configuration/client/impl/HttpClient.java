@@ -23,7 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -31,6 +34,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -44,18 +51,40 @@ import java.util.logging.Logger;
 @SuppressWarnings("WeakerAccess")
 @Singleton
 public class HttpClient {
-    public static final String AUTHENTICATION_HEADER = "Authentication";
+    public static final String AUTHENTICATION_HEADER = "Authorization";
     private static final ExecutorService DEFAULT_EXECUTOR = Executor.getInstance();
     private static final Logger LOGGER = Logger.getLogger(HttpClient.class.getCanonicalName());
     private static final ConcurrentHashMap<String, String> PERMANENT_REDIRECTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, AuthenticationToken> TOKEN_MAP = new ConcurrentHashMap<>();
+    private final CertificateTool certificateTool;
     private AuthenticationCallback authenticationCallback;
     private ErrorCallback errorCallback;
-    private SSLSocketFactory sslSocketFactory;
+    private final SSLSocketFactory sslSocketFactory;
 
     @Inject
-    public HttpClient(){
-       System.out.println("HttpClient");
+    public HttpClient(KeyStore keyStore){
+        System.out.println("HttpClient");
+        if(keyStore == null){
+            LOGGER.warning("No keystore for SSL.");
+            this.certificateTool = null;
+        } else {
+            this.certificateTool = new CertificateTool(keyStore);
+        }
+        SSLContext ctx =null;
+        try {
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(keyStore);
+            ctx = SSLContext.getInstance("TLSv1");
+            ctx.init(null, tmf.getTrustManagers(), null);
+        } catch (KeyManagementException |KeyStoreException |NoSuchAlgorithmException e) {
+            LOGGER.log(Level.SEVERE, "Failed to initialize SSL with keystore.");
+        }
+        if(ctx != null){
+            sslSocketFactory = ctx.getSocketFactory();
+        } else {
+            sslSocketFactory = null;
+        }
+
     }
 
 
@@ -108,8 +137,8 @@ public class HttpClient {
             DEFAULT_EXECUTOR.submit(() -> {
                 try {
                     HttpURLConnection connection = (HttpURLConnection) u.openConnection();
-                    if(sslSocketFactory != null && connection instanceof HttpsURLConnection){
-                        HttpsURLConnection httpsConnection = (HttpsURLConnection)connection ;
+                    if (sslSocketFactory != null && connection instanceof HttpsURLConnection) {
+                        HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
                         httpsConnection.setSSLSocketFactory(sslSocketFactory);
                         // Verify the hostname with a discovered device name, or the usual methods.
                         httpsConnection.setHostnameVerifier((s, sslSession) -> {
@@ -130,6 +159,7 @@ public class HttpClient {
                         );
                     }
                     connection.setUseCaches(false);
+                    connection.setInstanceFollowRedirects(false);
                     switch (connection.getResponseCode()) {
                         case 200:
                             break;
@@ -137,8 +167,10 @@ public class HttpClient {
                             PERMANENT_REDIRECTS.put(url, connection.getHeaderField("Location"));
                         case 302:
                         case 303:
+                            LOGGER.info("Following redirect to " + connection.getHeaderField("Location"));
                             getToStream(deviceName, connection.getHeaderField("Location"), token, callback);
                             return;
+                        case 401:
                         case 403:
                             requestAuthorization(deviceName, url, token, callback);
                             return;
@@ -147,6 +179,14 @@ public class HttpClient {
                     }
                     callback.accept(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
 
+                } catch(SSLHandshakeException ce){
+                    try {
+                        if(this.certificateTool != null && this.certificateTool.addCertificatesForUrl(url)){
+                            getToStream(deviceName, url, authenticationToken, callback);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Couldn't get certificate for "+url);
+                    }
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Failed to fetch " + url, e);
                 }
@@ -174,10 +214,6 @@ public class HttpClient {
      */
     public void setErrorCallback(ErrorCallback callback) {
         this.errorCallback = callback;
-    }
-
-    public void setSSLSocketFactory(SSLSocketFactory factory){
-        this.sslSocketFactory = factory;
     }
 
     private void maybeSendError(String message) {

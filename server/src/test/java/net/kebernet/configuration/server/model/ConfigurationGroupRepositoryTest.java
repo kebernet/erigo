@@ -45,7 +45,7 @@ public class ConfigurationGroupRepositoryTest {
         }
 
         //Write files.
-        new DefaultFileExporter(etc, new StartupParameters()).exportMissingFiles();
+        new DefaultFileExporter(etc, new SettingValueRepository(dir,"testThing")).exportMissingFiles();
         ConfigurationGroupRepository repository = new ConfigurationGroupRepository(etc);
         assertTrue(repository.load());
         List<ConfigurationGroup> groups = repository.getGroups();

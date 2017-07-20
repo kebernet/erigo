@@ -24,6 +24,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.HashSet;
@@ -58,10 +59,12 @@ public class RemoteAccessFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
-        if (localAddresses.contains(request.getRemoteAddr())) {
-            // Locally accessed.
+        if (localAddresses.contains(request.getRemoteAddr()) || request.getRemoteAddr().matches(hostMatchRegex)) {
+            chain.doFilter(request, response);
+        } else if(response instanceof HttpServletResponse) {
+            ((HttpServletResponse) response).setStatus(403);
         } else {
-            // Remotely accessed.
+            throw new ServletException("What the hell is going on here?");
         }
     }
 

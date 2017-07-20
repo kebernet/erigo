@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server;
 
+import net.kebernet.configuration.server.model.SettingValueRepository;
 import org.junit.Test;
 
 import java.io.File;
@@ -35,7 +36,7 @@ public class ExportDefaultFilesTest {
         if(!settingsDirectory.mkdirs()){
             Logger.getAnonymousLogger().info("Didn't create "+settingsDirectory.getAbsolutePath());
         }
-        new DefaultFileExporter(settingsDirectory, new StartupParameters()).exportMissingFiles();
+        new DefaultFileExporter(settingsDirectory, new SettingValueRepository(settingsDirectory, "testThing")).exportMissingFiles();
         for(String string : Arrays.asList(
                 "/configs/host/var/tmp/sethostname.sh",
                 "/configs/host/group.json",

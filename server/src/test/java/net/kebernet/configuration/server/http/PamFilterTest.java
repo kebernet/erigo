@@ -13,11 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.server;
+package net.kebernet.configuration.server.http;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.jvnet.libpam.PAM;
+import org.jvnet.libpam.PAMException;
+import org.jvnet.libpam.UnixUser;
+
+import static org.junit.Assert.*;
 
 /**
- * Created by rcooper on 7/6/17.
+ * Created by rcooper on 7/20/17.
  */
+public class PamFilterTest {
 
-public class MDNSService {
+
+    @Test @Ignore
+    public void testSimplePam() throws PAMException {
+        PAM pam = new PAM("login");
+        UnixUser u = pam.authenticate("rcooper", "password");
+        System.out.println(u.getDir());
+    }
 }

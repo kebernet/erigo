@@ -31,7 +31,7 @@ public class MulticastDNSDevicesTest {
     @Test
     public void testDiscovery() throws Exception {
         SettableFuture<Device> deviceFuture = SettableFuture.create();
-        MulticastDNSDevices devices = new MulticastDNSDevices(new HttpClient());
+        MulticastDNSDevices devices = new MulticastDNSDevices(new HttpClient(null));
 
         //Listen for initial discovery
         devices.listenForDevices(result -> {

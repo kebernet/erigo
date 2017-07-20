@@ -28,6 +28,8 @@ import net.kebernet.configuration.client.service.SettingsService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.net.ssl.SSLSocketFactory;
+import java.security.KeyStore;
 
 /**
  * Dagger Module.
@@ -39,6 +41,12 @@ import javax.inject.Singleton;
         }
 )
 public class DefaultModule {
+
+    @Provides
+    @Singleton
+    public KeyStore factory(){
+        return null;
+    }
 
     @Provides
     @Singleton

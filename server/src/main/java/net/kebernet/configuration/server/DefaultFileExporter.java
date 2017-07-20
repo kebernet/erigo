@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.pureperfect.ferret.Scanner;
 import com.pureperfect.ferret.vfs.Directory;
+import net.kebernet.configuration.server.model.SettingValueRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,12 +47,12 @@ public class DefaultFileExporter {
     private final File settingsDirectory;
 
     private final Scanner classpathScanner = new Scanner();
-    private final StartupParameters parameters;
+    private final SettingValueRepository valueRepository;
 
     @Inject
-    public DefaultFileExporter(@Named("storageDirectory") File settingsDirectory, StartupParameters parameters) {
+    public DefaultFileExporter(@Named("storageDirectory") File settingsDirectory, SettingValueRepository valueRepository) {
         this.settingsDirectory = settingsDirectory;
-        this.parameters = parameters;
+        this.valueRepository = valueRepository;
         this.classpathScanner.add(DefaultFileExporter.class.getClassLoader());
         if (!settingsDirectory.mkdirs()) {
             LOGGER.warning("Didn't mkdirs" + settingsDirectory.getAbsolutePath());
@@ -62,13 +63,13 @@ public class DefaultFileExporter {
         writeMissingFiles("/adhoc");
         writeMissingFiles("/wifi");
         writeMissingFiles("/configs");
-        checkKeystore();
+        checkKeystoreGeneration();
     }
 
-    private void checkKeystore() {
+    private void checkKeystoreGeneration() {
         File keystoreFile = new File(settingsDirectory, "keystore.jks");
         if (!keystoreFile.exists()) {
-            String hostname = WifiConfigWriter.computeDefaultName(parameters);
+            String hostname = valueRepository.getDeviceName();
             String ip = "";
             try {
                 for (byte b : InetAddress.getLocalHost().getAddress()) {

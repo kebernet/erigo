@@ -39,10 +39,9 @@ import javax.ws.rs.Path;
  */
 @SwaggerDefinition(
         info = @Info(
-                description = "Gets the weather",
-                version = "V12.0.12",
-                title = "The Weather API",
-                termsOfService = "http://theweatherapi.io/terms.html",
+                description = "The Erigo Device Configuration service. This lets you configure your IoT-ish devices.",
+                version = "1.0.0",
+                title = "Erigo Configuration API",
                 contact = @Contact(
                         name = "Robert Cooper",
                         email = "kebernet@gmail.com",

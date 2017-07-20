@@ -45,11 +45,13 @@ public class SettingValueRepository {
     private final File storageDirectory;
     private final Properties properties = new Properties();
     private final File settingsFile;
+    private final String defaultDeviceName;
     private long lastRead = Long.MIN_VALUE;
 
     @Inject
-    public SettingValueRepository(@Named("storageDirectory") File storageDirectory) {
+    public SettingValueRepository(@Named("storageDirectory") File storageDirectory,  @Named("defaultDeviceName") String defaultDeviceName) {
         this.storageDirectory = storageDirectory;
+        this.defaultDeviceName = defaultDeviceName;
         this.settingsFile = new File(storageDirectory, "settings.properties");
 
     }
@@ -91,5 +93,9 @@ public class SettingValueRepository {
 
     public String findValue(String settingName, String defaultValue) {
         return properties.getProperty(settingName, defaultValue);
+    }
+
+    public String getDeviceName(){
+        return findValue("host_name", defaultDeviceName);
     }
 }
