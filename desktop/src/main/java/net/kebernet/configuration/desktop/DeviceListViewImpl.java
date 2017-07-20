@@ -15,18 +15,15 @@
  */
 package net.kebernet.configuration.desktop;
 
-import javax.inject.Singleton;
-import javax.swing.*;
-
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.model.Device;
 
+import javax.inject.Singleton;
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collections;

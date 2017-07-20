@@ -20,8 +20,8 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import net.kebernet.configuration.client.app.DeviceSettingsView;
 import net.kebernet.configuration.client.model.Group;
-import net.kebernet.configuration.client.model.Settings;
 import net.kebernet.configuration.client.model.SettingValue;
+import net.kebernet.configuration.client.model.Settings;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

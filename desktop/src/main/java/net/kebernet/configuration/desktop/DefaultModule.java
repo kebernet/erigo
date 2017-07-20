@@ -26,9 +26,7 @@ import net.kebernet.configuration.client.service.CompositeDiscoveryService;
 import net.kebernet.configuration.client.service.DiscoveryService;
 import net.kebernet.configuration.client.service.SettingsService;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.net.ssl.SSLSocketFactory;
 import java.security.KeyStore;
 
 /**
