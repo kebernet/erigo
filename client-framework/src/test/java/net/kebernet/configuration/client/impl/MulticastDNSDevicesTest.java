@@ -55,7 +55,7 @@ public class MulticastDNSDevicesTest {
         devices.listenForDevices(result -> {
             System.out.println(result);
             result.stream().filter(d->
-                    d.getName().equals("Unit Test Device")
+                    d.getName().startsWith("Unit Test Device")
             ).findFirst().ifPresent(deviceFuture::set);
             return true;
         });
@@ -70,7 +70,7 @@ public class MulticastDNSDevicesTest {
         SettableFuture<Device> deviceFuture2 = SettableFuture.create();
         devices.listKnownDevices(result -> {
             result.stream().filter(d->
-                    d.getName().equals("Unit Test Device")
+                    d.getName().startsWith("Unit Test Device")
             ).findFirst().ifPresent(deviceFuture2::set);
             return false;
         });
