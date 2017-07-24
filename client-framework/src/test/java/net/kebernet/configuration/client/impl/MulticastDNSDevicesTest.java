@@ -60,7 +60,7 @@ public class MulticastDNSDevicesTest {
         });
         devices.startListening();
 
-        Device device = deviceFuture.get();
+        Device device = deviceFuture.get(2, TimeUnit.MINUTES);
         assertTrue(device != null);
         assertTrue(device.getAddress().startsWith("http://"));
 
