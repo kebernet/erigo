@@ -115,7 +115,16 @@ public class SerialPortDevices implements DiscoveryService {
 
     @Override
     public void listKnownDevices(@Nonnull DeviceListCallback callback) {
-        DEFAULT_EXECUTOR.submit(()-> callback.onDevices(new ArrayList<>(devices.values())));
+        try {
+            if(Boolean.TRUE.equals(
+                    DEFAULT_EXECUTOR.submit
+                            (()-> callback.onDevices(new ArrayList<>(devices.values())))
+                .get(1, TimeUnit.MINUTES)) ){
+                LOGGER.warning("Got unexpected true from device list callback on listKnownDevices.");
+            }
+        } catch (TimeoutException |ExecutionException| InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Unexpected exception ", e);
+        }
     }
 
     @Override
