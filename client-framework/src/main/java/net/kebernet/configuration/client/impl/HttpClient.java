@@ -19,6 +19,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.net.ssl.HostnameVerifier;
@@ -53,6 +55,8 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /**
  * This is a simple HTTP client built on java.io for x-plat availability.
  */
@@ -70,89 +74,97 @@ public class HttpClient {
     private ErrorCallback errorCallback;
 
     @Inject
-    public HttpClient(KeyStore keyStore, AuthenticationCallback authenticationCallback) {
+    public HttpClient(@Nullable KeyStore keyStore, @Nullable AuthenticationCallback authenticationCallback) {
+        SSLContext ctx = null;
         if (keyStore == null) {
             LOGGER.warning("No keystore for SSL.");
             this.certificateTool = null;
+            try {
+                ctx = SSLContext.getDefault();
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.log(Level.SEVERE, "Failed to get TLS context", e);
+            }
         } else {
             this.certificateTool = new CertificateTool(keyStore);
+
+            try {
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init((KeyStore) null);
+                X509TrustManager defaultTm = null;
+
+                for (TrustManager tm : tmf.getTrustManagers()) {
+                    if (tm instanceof X509TrustManager) {
+                        defaultTm = (X509TrustManager) tm;
+                        break;
+                    }
+                }
+
+                tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(keyStore);
+                X509TrustManager myTm = null;
+                for (TrustManager tm : tmf.getTrustManagers()) {
+                    if (tm instanceof X509TrustManager) {
+                        myTm = (X509TrustManager) tm;
+                        break;
+                    }
+                }
+                checkState(defaultTm != null, "Unable to get a default trust manager.");
+                X509TrustManager finalDefaultTm = defaultTm;
+                X509TrustManager finalMyTm = myTm;
+                X509TrustManager delegatingTM = new X509TrustManager() {
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        ArrayList<X509Certificate> certs = new ArrayList<>();
+                        try {
+                            Enumeration<String> a = keyStore.aliases();
+                            while(a.hasMoreElements()){
+                                Certificate c = keyStore.getCertificate(a.nextElement());
+                                if(c instanceof X509Certificate) {
+                                    certs.add((X509Certificate) c);
+                                }
+                            }
+                        } catch (KeyStoreException e) {
+                            LOGGER.log(Level.SEVERE, "Failed to read certificates from keystore!", e);
+                        }
+                        if (finalMyTm != null) {
+                            certs.addAll(Arrays.asList(finalMyTm.getAcceptedIssuers()));
+                        }
+                        return certs.toArray(new X509Certificate[certs.size()]);
+
+                    }
+
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain,
+                                                   String authType) throws CertificateException {
+                        try {
+                            for(X509Certificate c: chain){
+                                if(keyStore.getCertificateAlias(c) != null){
+                                    return;
+                                }
+                            }
+                            if (finalMyTm != null) {
+                                finalMyTm.checkServerTrusted(chain, authType);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.log(Level.INFO, "Certificate miss on internal keystore.", e);
+                            finalDefaultTm.checkServerTrusted(chain, authType);
+                        }
+                    }
+
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain,
+                                                   String authType) throws CertificateException {
+                        finalDefaultTm.checkClientTrusted(chain, authType);
+                    }
+                };
+                ctx = SSLContext.getInstance("TLS");
+                ctx.init(null, new TrustManager[] { delegatingTM }, null);
+            } catch (NullPointerException | KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
+                LOGGER.log(Level.SEVERE, "Failed to initialize SSL with keystore.");
+            }
         }
         this.authenticationCallback = authenticationCallback;
-        SSLContext ctx = null;
-        try {
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init((KeyStore) null);
-            X509TrustManager defaultTm = null;
 
-            for (TrustManager tm : tmf.getTrustManagers()) {
-                if (tm instanceof X509TrustManager) {
-                    defaultTm = (X509TrustManager) tm;
-                    break;
-                }
-            }
-
-
-            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keyStore);
-            X509TrustManager myTm = null;
-            for (TrustManager tm : tmf.getTrustManagers()) {
-                if (tm instanceof X509TrustManager) {
-                    myTm = (X509TrustManager) tm;
-                    break;
-                }
-            }
-
-            X509TrustManager finalDefaultTm = defaultTm;
-            X509TrustManager finalMyTm = myTm;
-            X509TrustManager delegatingTM = new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    ArrayList<X509Certificate> certs = new ArrayList<>();
-                    try {
-                        Enumeration<String> a = keyStore.aliases();
-                        while(a.hasMoreElements()){
-                            Certificate c = keyStore.getCertificate(a.nextElement());
-                            if(c instanceof X509Certificate) {
-                                certs.add((X509Certificate) c);
-                            }
-                        }
-                    } catch (KeyStoreException e) {
-                        e.printStackTrace();
-                    }
-                    certs.addAll(Arrays.asList(finalMyTm.getAcceptedIssuers()));
-                    return certs.toArray(new X509Certificate[certs.size()]);
-
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                    try {
-                        for(X509Certificate c: chain){
-                            if(keyStore.getCertificateAlias(c) != null){
-                                return;
-                            }
-                        }
-                        finalMyTm.checkServerTrusted(chain, authType);
-                    } catch (Exception e) {
-                        LOGGER.log(Level.INFO, "Certificate miss on internal keystore.", e);
-                        finalDefaultTm.checkServerTrusted(chain, authType);
-                    }
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                    // If you're planning to use client-cert auth,
-                    // do the same as checking the server.
-                    finalDefaultTm.checkClientTrusted(chain, authType);
-                }
-            };
-            ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, new TrustManager[] { delegatingTM }, null);
-        } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize SSL with keystore.");
-        }
 
         if (ctx != null) {
             sslSocketFactory = ctx.getSocketFactory();
@@ -183,7 +195,7 @@ public class HttpClient {
      * @param uri URI to read.
      * @return the String for the TOKEN_MAP.
      */
-    public static String uriToKey(URI uri) {
+    public static String uriToKey(@Nonnull URI uri) {
         return new StringBuilder(uri.getScheme())
                 .append("::")
                 .append(uri.getHost())
@@ -202,11 +214,11 @@ public class HttpClient {
      * @param url        The URL to hit.
      * @param callback   A callback with the result.
      */
-    public void getToStream(String deviceName, String url, Consumer<InputStreamReader> callback) {
+    public void getToStream(@Nonnull String deviceName, @Nonnull String url, @Nonnull Consumer<InputStreamReader> callback) {
         getToStream(deviceName, url, null, callback);
     }
 
-    public void getToStream(String deviceName, String url, AuthenticationToken authenticationToken, Consumer<InputStreamReader> callback) {
+    public void getToStream(@Nonnull String deviceName, @Nonnull String url, @Nullable AuthenticationToken authenticationToken, @Nonnull Consumer<InputStreamReader> callback) {
         try {
             final URL u = new URL(PERMANENT_REDIRECTS.getOrDefault(url, url));
             AuthenticationToken token = TOKEN_MAP.getOrDefault(uriToKey(u.toURI()), authenticationToken);

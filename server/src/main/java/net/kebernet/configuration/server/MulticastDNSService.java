@@ -37,6 +37,7 @@ import java.util.logging.Logger;
  * Created by rcooper on 7/6/17.
  */
 
+@SuppressWarnings("WeakerAccess")
 @Singleton
 public class MulticastDNSService {
     private static final Logger LOGGER = Logger.getLogger(MulticastDNSDevices.class.getCanonicalName());

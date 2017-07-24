@@ -33,6 +33,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -129,12 +130,12 @@ public class DefaultFileExporter {
                                 new InputStreamReader(WifiConfigWriter.class.getResourceAsStream(prefix + "/" + file), Charsets.UTF_8),
                                 output);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.SEVERE, "Failed to write file "+target.getAbsolutePath(), e);
                     }
                 });
     }
 
-    List<String> listResources(String path) throws IOException {
+    private List<String> listResources(String path) throws IOException {
         return classpathScanner.scan(
                 (resource) ->
                         resource.getFullPath().contains(path) &&

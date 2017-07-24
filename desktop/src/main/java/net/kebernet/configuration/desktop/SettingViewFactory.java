@@ -30,10 +30,39 @@ public class SettingViewFactory {
 
     @Inject
     public SettingViewFactory(){
-
     }
-    public JComponent getComponentForType(String type, String initialValue, Consumer<String> onValueChangeCallback) {
+
+
+    JComponent getComponentForType(String type, String initialValue, Consumer<String> onValueChangeCallback) {
+        if(type == null){
+            return null;
+        }
+        switch (type){
+            case "password":
+                return createPasswordField(initialValue, onValueChangeCallback);
+           default:
+                return createTextField(initialValue, onValueChangeCallback);
+        }
+    }
+
+    private JTextField createTextField(String initialValue, Consumer<String> onValueChangeCallback){
         JTextField textField = new JTextField(initialValue);
+        textField.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                onValueChangeCallback.accept(textField.getText());
+            }
+            public void removeUpdate(DocumentEvent e) {
+                onValueChangeCallback.accept(textField.getText());
+            }
+            public void insertUpdate(DocumentEvent e) {
+                onValueChangeCallback.accept(textField.getText());
+            }
+        });
+        return textField;
+    }
+
+    private JPasswordField createPasswordField(String initialValue, Consumer<String> onValueChangeCallback){
+        JPasswordField textField = new JPasswordField(initialValue);
         textField.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onValueChangeCallback.accept(textField.getText());

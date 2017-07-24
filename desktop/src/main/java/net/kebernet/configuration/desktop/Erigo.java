@@ -35,7 +35,7 @@ public class Erigo {
     }
 
     public Erigo(){
-        this.objectGraph = ObjectGraph.create(new DefaultModule());
+        this.objectGraph = ObjectGraph.create(new DesktopModule());
     }
 
     public void run(){

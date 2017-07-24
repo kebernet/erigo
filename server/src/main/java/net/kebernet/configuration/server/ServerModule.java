@@ -28,6 +28,7 @@ import java.io.File;
  * Created by rcooper on 7/17/17.
  */
 
+@SuppressWarnings("unused")
 @Module(
         injects = {
                 DefaultFileExporter.class,

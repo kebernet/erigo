@@ -43,11 +43,10 @@ import java.util.logging.Logger;
 @Singleton
 public class ConfigWriter {
     private final MustacheFactory factory = new DefaultMustacheFactory();
-    protected final Map<String, Object> renderContext = new HashMap<>();
-
-    protected static final Logger LOGGER = Logger.getLogger(WifiConfigWriter.class.getCanonicalName());
-    protected final File storageDirectory;
-    protected final File targetDirectory;
+    final Map<String, Object> renderContext = new HashMap<>();
+    static final Logger LOGGER = Logger.getLogger(WifiConfigWriter.class.getCanonicalName());
+    final File storageDirectory;
+    final File targetDirectory;
 
 
     @Inject
@@ -64,7 +63,7 @@ public class ConfigWriter {
     }
 
 
-    protected void transformAndWrite(File templateFolder, File destinationFolder) throws IOException {
+    void transformAndWrite(File templateFolder, File destinationFolder) throws IOException {
         for (String file : FileUtils.listAllRelativeFilePaths(templateFolder)) {
             File source = new File(templateFolder, file);
             File target = new File(destinationFolder, file);

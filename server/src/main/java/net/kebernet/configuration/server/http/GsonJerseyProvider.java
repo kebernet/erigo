@@ -55,7 +55,7 @@ public class GsonJerseyProvider implements MessageBodyWriter<Object>, MessageBod
             throws IOException {
 
         try (InputStreamReader streamReader = new InputStreamReader(entityStream,
-                UTF_8);) {
+                UTF_8)) {
             return GsonFactory.newInstance().fromJson(streamReader, genericType);
         } catch (com.google.gson.JsonSyntaxException e) {
             LOGGER.log(Level.WARNING, null, e);
@@ -81,7 +81,7 @@ public class GsonJerseyProvider implements MessageBodyWriter<Object>, MessageBod
                         MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException,
             WebApplicationException {
-        try (OutputStreamWriter writer = new OutputStreamWriter(entityStream, UTF_8);) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(entityStream, UTF_8)) {
             GsonFactory.newInstance().toJson(object, genericType, writer);
         }
     }

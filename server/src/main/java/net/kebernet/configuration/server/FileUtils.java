@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 /**
  * Created by rcooper on 7/17/17.
  */
+@SuppressWarnings("WeakerAccess")
 public class FileUtils {
 
     private static final File[] NO_FILES = new File[0];

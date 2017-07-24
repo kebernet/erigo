@@ -26,7 +26,6 @@ import net.kebernet.configuration.client.service.CompositeDiscoveryService;
 import net.kebernet.configuration.client.service.DiscoveryService;
 import net.kebernet.configuration.client.service.SettingsService;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -40,14 +39,15 @@ import java.util.logging.Logger;
  * Dagger Module.
  * Created by rcooper on 7/7/17.
  */
+@SuppressWarnings("unused")
 @Module(
         injects = {
                 AppFlowImpl.class
         }
 )
-public class DefaultModule {
+public class DesktopModule {
 
-    private static final Logger LOGGER = Logger.getLogger(DefaultModule.class.getCanonicalName());
+    private static final Logger LOGGER = Logger.getLogger(DesktopModule.class.getCanonicalName());
 
     @Provides
     @Singleton

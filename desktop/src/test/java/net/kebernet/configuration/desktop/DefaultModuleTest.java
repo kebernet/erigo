@@ -18,8 +18,6 @@ package net.kebernet.configuration.desktop;
 import dagger.ObjectGraph;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by rcooper on 7/18/17.
  */
@@ -27,7 +25,7 @@ public class DefaultModuleTest {
 
     @Test
     public void testModule(){
-        ObjectGraph graph = ObjectGraph.create(new DefaultModule());
+        ObjectGraph graph = ObjectGraph.create(new DesktopModule());
         AppFlowImpl impl = graph.get(AppFlowImpl.class);
     }
 

@@ -22,7 +22,6 @@ import net.kebernet.configuration.client.service.DiscoveryService;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.LinkedHashSet;
 import java.util.logging.Logger;
 
 /**
@@ -34,8 +33,6 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
     private final DeviceListView view;
     private final DiscoveryService service;
     private AppFlow appFlow;
-
-    private final LinkedHashSet<Device> knownDevices = new LinkedHashSet<>();
     private boolean isShutdown;
 
 
@@ -51,13 +48,11 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
         view.setDeviceSelectionCallback(this);
         view.setRefreshClicked(this);
         service.listKnownDevices(devices -> {
-            knownDevices.addAll(devices);
             view.showDeviceList(devices);
             return false;
         });
         service.listenForDevices(devices -> {
             view.addDevicesToList(devices);
-            knownDevices.addAll(devices);
             return isShutdown;
         });
         service.refresh();
@@ -70,7 +65,7 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
     }
 
     @Override
-    public void onDeviceSelected(Device device) {
+    public void onDeviceSelected(@Nonnull Device device) {
         LOGGER.info("Device selected "+device);
         appFlow.showDevice(device);
     }
@@ -78,7 +73,6 @@ public class DeviceListPresenter implements DeviceListView.RefreshCallback, Devi
 
     @Override
     public void onRefreshClicked() {
-        knownDevices.clear();
         service.refresh();
     }
 

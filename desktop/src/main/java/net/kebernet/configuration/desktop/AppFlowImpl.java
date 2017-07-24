@@ -20,6 +20,7 @@ import net.kebernet.configuration.client.app.DeviceListPresenter;
 import net.kebernet.configuration.client.app.DeviceSettingsPresenter;
 import net.kebernet.configuration.client.model.Device;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.*;
@@ -66,7 +67,7 @@ public class AppFlowImpl implements AppFlow {
     }
 
     @Override
-    public void showDevice(Device device) {
+    public void showDevice(@Nonnull Device device) {
         SwingUtilities.invokeLater(()->{
             deviceListPresenter.unbind();
             frame.setContentPane(

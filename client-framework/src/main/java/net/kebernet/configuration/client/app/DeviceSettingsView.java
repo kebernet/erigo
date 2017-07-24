@@ -37,6 +37,8 @@ public interface DeviceSettingsView {
     void setSaveCallback(@Nullable SaveCallback callback);
     void setCancelCallback(@Nullable CancelCallback callback);
 
+    void showError(String s);
+
     interface SettingsChangedCallback {
         void onSettingChanged(@Nonnull String name, @Nullable String value);
     }

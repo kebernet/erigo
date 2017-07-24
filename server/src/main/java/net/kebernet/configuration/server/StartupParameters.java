@@ -20,6 +20,7 @@ import com.beust.jcommander.Parameter;
 /**
  * Created by rcooper on 6/13/17.
  */
+@SuppressWarnings("unused")
 public class StartupParameters {
 
     @Parameter(names = {"-d", "--device-type"}, description = "The name of the device. Will be postfixed with the last " +

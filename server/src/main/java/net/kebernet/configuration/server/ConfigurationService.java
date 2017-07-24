@@ -44,7 +44,7 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
     private final ObjectGraph graph;
     private final StartupParameters parameters;
 
-    public ConfigurationService(StartupParameters parameters, ObjectGraph graph) {
+    private ConfigurationService(StartupParameters parameters, ObjectGraph graph) {
         this.parameters = parameters;
         this.graph = graph;
     }
@@ -58,7 +58,7 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
         startup(parameters);
     }
 
-    public static void startup(StartupParameters parameters) throws Exception{
+    static void startup(StartupParameters parameters) throws Exception{
         LOGGER.info("Instantiating object graph.");
         ObjectGraph graph = ObjectGraph.create(new ServerModule(parameters));
 

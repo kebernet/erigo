@@ -21,8 +21,10 @@ import net.kebernet.configuration.client.model.SettingValue;
 import net.kebernet.configuration.client.service.SettingsService;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,6 +40,8 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
     private List<SettingValue> values;
     private AtomicInteger responseCount = new AtomicInteger();
     private AppFlow appFlow;
+    private List<SettingValue> toSave = new ArrayList<>();
+    private Device device;
 
     @Inject
     public DeviceSettingsPresenter(@Nonnull DeviceSettingsView view,
@@ -48,6 +52,7 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
 
     public void bind(@Nonnull AppFlow flow, @Nonnull Device device){
         this.appFlow = flow;
+        this.device = device;
         view.setDeviceName(device.getName());
         view.setSettingChangedCallback(this);
         view.setCancelCallback(this);
@@ -79,13 +84,22 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
     }
 
     @Override
-    public void onSaveClicked() {
-
+    public synchronized void onSaveClicked() {
+        ArrayList<SettingValue> toSend = new ArrayList<>(toSave);
+        toSave.clear();
+        service.saveSettings(this.device.getName(), this.device.getSettingsValuesUrl(), toSend, (didSave)->{
+            if(didSave){
+                appFlow.showDeviceList();
+            } else {
+                view.showError("Failed to save settings.");
+            }
+        });
     }
 
     @Override
-    public void onSettingChanged(String name, String value) {
-        view.setSaveCallback(this);
+    public void onSettingChanged(@Nonnull String name, @Nullable String value) {
+        view.setSaveCallback(this); // enable save operation after change.
+        toSave.add(new SettingValue(name, value));
     }
 
     public DeviceSettingsView getView(){

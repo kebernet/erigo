@@ -54,7 +54,7 @@ public class PamFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = null;
+        String header;
         if(response instanceof HttpServletResponse && request instanceof HttpServletRequest){
             HttpServletResponse resp = (HttpServletResponse) response;
             HttpServletRequest req = (HttpServletRequest) request;

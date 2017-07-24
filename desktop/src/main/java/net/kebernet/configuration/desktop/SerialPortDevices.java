@@ -65,16 +65,20 @@ public class SerialPortDevices implements DiscoveryService {
     private final CopyOnWriteArrayList<DeviceListCallback> listeners = new CopyOnWriteArrayList<>();
     private ErrorCallback errorCallback;
 
-    public SerialPortDevices(){
+    SerialPortDevices(){
     }
 
     @Override
     public synchronized void refresh(){
         try {
-            Enumeration<CommPortIdentifier> portEnum = CommPortIdentifier.getPortIdentifiers();
+            Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
             ArrayList<CommPortIdentifier> serialPorts = new ArrayList<>();
             while (portEnum.hasMoreElements()) {
-                CommPortIdentifier cpi = portEnum.nextElement();
+                Object o = portEnum.nextElement();
+                if(!(o instanceof CommPortIdentifier)){
+                    continue;
+                }
+                CommPortIdentifier cpi = (CommPortIdentifier) o;
                 if (cpi.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                     serialPorts.add(cpi);
                 }
@@ -111,9 +115,7 @@ public class SerialPortDevices implements DiscoveryService {
 
     @Override
     public void listKnownDevices(@Nonnull DeviceListCallback callback) {
-        DEFAULT_EXECUTOR.submit(()->{
-            callback.onDevices(new ArrayList<>(devices.values()));
-        });
+        DEFAULT_EXECUTOR.submit(()-> callback.onDevices(new ArrayList<>(devices.values())));
     }
 
     @Override
@@ -129,10 +131,7 @@ public class SerialPortDevices implements DiscoveryService {
                 LOGGER.log(Level.WARNING, null, e);
             }
             LOGGER.info("Done with "+o.getClass().getCanonicalName());
-        } else {
-            return;
         }
-
     }
 
     private void maybeSendError(String error){
@@ -192,7 +191,7 @@ public class SerialPortDevices implements DiscoveryService {
         }
 
         private void doProtocol(){
-            String token = null;
+            String token;
             switch(state){
                 case WAIT_HELLO:
                     token = readToken();
@@ -207,7 +206,7 @@ public class SerialPortDevices implements DiscoveryService {
                     break;
                 case WAIT_SETTINGS:
                     token = readToken();
-                    if(parseDevice(token)){
+                    if(token != null && parseDevice(token)){
                         state = ProtocolState.DONE;
                     }
                     doNext();

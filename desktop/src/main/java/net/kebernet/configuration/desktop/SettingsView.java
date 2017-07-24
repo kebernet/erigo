@@ -23,6 +23,7 @@ import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.SettingValue;
 import net.kebernet.configuration.client.model.Settings;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.swing.*;
@@ -74,7 +75,7 @@ public class SettingsView implements DeviceSettingsView, DeviceSettingsView.Sett
     }
 
     @Override
-    public void setDeviceName(String name) {
+    public void setDeviceName(@Nonnull String name) {
         SwingUtilities.invokeLater(() -> {
             this.deviceName.setText(name);
             this.deviceName.revalidate();
@@ -114,7 +115,12 @@ public class SettingsView implements DeviceSettingsView, DeviceSettingsView.Sett
     }
 
     @Override
-    public void onSettingChanged(String name, String value) {
+    public void showError(String s) {
+
+    }
+
+    @Override
+    public void onSettingChanged(@Nonnull String name, String value) {
         if (this.settingsCallback != null) {
             this.settingsCallback.onSettingChanged(name, value);
         }

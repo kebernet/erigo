@@ -38,7 +38,7 @@ public class FilePersistenceAuthenticationCallbackTest {
         }
         String checkString = "http://localhost:9999/";
         HttpClient.AuthenticationToken checkToken = new HttpClient.BasicAuthenticationToken("user", "password");
-        FilePersistenceAuthenticationCallback instance = new FilePersistenceAuthenticationCallback("localhost", testFile,
+        FilePersistenceAuthenticationCallback instance = new FilePersistenceAuthenticationCallback(testFile,
                 ((deviceName, url, previousToken, callback1) -> {
                 assertEquals(checkString, url);
                 assertNull(previousToken);

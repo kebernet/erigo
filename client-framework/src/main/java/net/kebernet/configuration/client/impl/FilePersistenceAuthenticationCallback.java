@@ -47,7 +47,6 @@ import javax.annotation.Nullable;
 @SuppressWarnings("WeakerAccess")
 public class FilePersistenceAuthenticationCallback implements HttpClient.AuthenticationCallback {
     private static final Logger LOGGER = Logger.getLogger(FilePersistenceAuthenticationCallback.class.getCanonicalName());
-    private final String deviceName;
     private final Properties properties = new Properties();
     private final HttpClient.AuthenticationCallback nestedCallback;
     private final File propertiesFile;
@@ -55,13 +54,11 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
     /**
      * A new constructor
      *
-     * @param deviceName The resolved name of the device
      * @param propertiesFile The props file to (maybe) read from
      * @param nestedCallback the callback to wrap with persistence.
      * @throws IOException That is a thing that might happen.
      */
-    public FilePersistenceAuthenticationCallback(@Nonnull String deviceName, @Nonnull File propertiesFile, @Nonnull HttpClient.AuthenticationCallback nestedCallback) throws IOException {
-        this.deviceName = deviceName;
+    public FilePersistenceAuthenticationCallback(@Nonnull File propertiesFile, @Nonnull HttpClient.AuthenticationCallback nestedCallback) throws IOException {
         this.nestedCallback = nestedCallback;
         this.propertiesFile = propertiesFile;
         if(!propertiesFile.getParentFile().exists() && !propertiesFile.getParentFile().mkdirs()){
@@ -83,6 +80,7 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
      * @return Result of the callable.
      * @throws IOException The only thrown checked exception. All others become runtime.
      */
+    @SuppressWarnings("UnusedReturnValue")
     @Nullable
     private static synchronized <T> T syncExecute(@Nonnull Callable<T> r) throws IOException {
         try {
@@ -186,6 +184,7 @@ public class FilePersistenceAuthenticationCallback implements HttpClient.Authent
     /**
      * A class for auth tokens that are saved to the props file.
      */
+    @SuppressWarnings("unused")
     static class PersistedAuthenticationToken implements HttpClient.AuthenticationToken {
 
         private final String key;

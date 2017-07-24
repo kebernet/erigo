@@ -21,6 +21,7 @@ import com.intellij.uiDesigner.core.Spacer;
 import net.kebernet.configuration.client.app.DeviceListView;
 import net.kebernet.configuration.client.model.Device;
 
+import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +48,7 @@ public class DeviceListViewImpl implements DeviceListView {
     private RefreshCallback refreshCallback;
     private DeviceSelectionCallback deviceSelected;
 
-    public DeviceListViewImpl() {
+    DeviceListViewImpl() {
         devicePanel.setLayout(new BoxLayout(devicePanel, BoxLayout.Y_AXIS));
         refreshButton.addActionListener((e) -> {
             if (refreshCallback != null) {
@@ -57,7 +58,7 @@ public class DeviceListViewImpl implements DeviceListView {
     }
 
     @Override
-    public synchronized void showDeviceList(List<Device> devices) {
+    public synchronized void showDeviceList(@Nonnull List<Device> devices) {
         SwingUtilities.invokeLater(() -> {
             this.devices.addAll(devices);
             render();
@@ -66,7 +67,7 @@ public class DeviceListViewImpl implements DeviceListView {
     }
 
     @Override
-    public synchronized void addDevicesToList(List<Device> devices) {
+    public synchronized void addDevicesToList(@Nonnull List<Device> devices) {
         SwingUtilities.invokeLater(() -> {
             LOGGER.info("Got devices " + devices);
             this.devices.addAll(devices);
@@ -118,7 +119,7 @@ public class DeviceListViewImpl implements DeviceListView {
         JFrame frame = new JFrame("DeviceListViewImpl");
         DeviceListViewImpl impl = new DeviceListViewImpl();
         frame.setContentPane(impl.root);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(640, 480);
         frame.setVisible(true);
     }
