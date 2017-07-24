@@ -53,7 +53,6 @@ public class MulticastDNSDevicesTest {
 
         //Listen for initial discovery
         devices.listenForDevices(result -> {
-            System.out.println(result);
             result.stream().filter(d->
                     d.getName().startsWith("Unit Test Device")
             ).findFirst().ifPresent(deviceFuture::set);

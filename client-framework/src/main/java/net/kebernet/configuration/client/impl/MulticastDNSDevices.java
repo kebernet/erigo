@@ -199,7 +199,6 @@ public class MulticastDNSDevices implements DiscoveryService {
     }
 
     private void dispatch(){
-        System.out.println("DISPATCH============ "+queuedForDispatch.size() +" to "+listeningCallbacks.size());
         ArrayList<Device> dispatch = new ArrayList<>();
         queuedForDispatch.stream()
                 .forEach((d) ->{
