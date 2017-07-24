@@ -41,8 +41,14 @@ public class WifiConfigWriterTest {
         params.setcSubnet(26);
         params.setStorageDirectory(etc.getAbsolutePath());
         params.setTargetDirectory(dir.getAbsolutePath());
-        WifiConfigWriter writer = new WifiConfigWriter(params);
-        writer.writeAdHocNetworkConfig();
+        try {
+            WifiConfigWriter writer = new WifiConfigWriter(params);
+            writer.writeAdHocNetworkConfig();
+
+        } catch(Exception e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 
