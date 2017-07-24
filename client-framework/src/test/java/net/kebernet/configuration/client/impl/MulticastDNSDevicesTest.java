@@ -68,8 +68,9 @@ public class MulticastDNSDevicesTest {
         //Check the stored list.
         SettableFuture<Device> deviceFuture2 = SettableFuture.create();
         devices.listKnownDevices(result -> {
-            deviceFuture2.set(result.stream().filter( d -> d.getName().equals("Unit Test Device"))
-                    .findFirst().get());
+            result.stream().filter(d->
+                    d.getName().equals("Unit Test Device")
+            ).findFirst().ifPresent(deviceFuture2::set);
             return false;
         });
         device = deviceFuture.get(1, TimeUnit.MINUTES);
