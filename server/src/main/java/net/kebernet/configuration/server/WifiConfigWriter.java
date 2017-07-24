@@ -62,17 +62,22 @@ public class WifiConfigWriter extends ConfigWriter {
 
     public static String computeDefaultName(StartupParameters startupParameters){
         String postFix = "UNKNOWN";
+        byte[] mac = null;
         try {
-            NetworkInterface networkInterface = NetworkInterface.getByName(startupParameters.getWlanInterface());
-            if(networkInterface == null){
-                networkInterface = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+            mac = NetworkInterface.getByName(startupParameters.getWlanInterface()).getHardwareAddress();
+        } catch(Exception e){
+            LOGGER.log(Level.WARNING, "Failed to get wlan interface.", e);
+            try {
+                mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
+            } catch(Exception le) {
+                LOGGER.log(Level.WARNING, "Failed to get localhost interface.", le);
             }
-            byte[] mac = networkInterface.getHardwareAddress();
+        }
+        if(mac != null) {
             postFix = Integer.toHexString(mac[mac.length - 2]) +
                     Integer.toHexString(mac[mac.length - 1]);
-        } catch (UnknownHostException | SocketException e) {
-            LOGGER.log(Level.WARNING, "Failed to get MAC address.", e);
         }
+
         return startupParameters.getDeviceType()+"-"+postFix;
     }
 
