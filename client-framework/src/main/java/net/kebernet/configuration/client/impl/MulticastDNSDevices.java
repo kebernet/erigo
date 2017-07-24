@@ -83,7 +83,11 @@ public class MulticastDNSDevices implements DiscoveryService {
 
     private void dispatchKnownDevices(@Nonnull DeviceListCallback callback) {
         synchronized (devices) {
-            callback.onDevices(new ArrayList<>(devices.values()));
+            try {
+                callback.onDevices(new ArrayList<>(devices.values()));
+            } catch(Exception e){
+                LOGGER.log(Level.WARNING, "Exception dispatching to known devices callback.", e);
+            }
         }
     }
 
@@ -195,6 +199,7 @@ public class MulticastDNSDevices implements DiscoveryService {
     }
 
     private void dispatch(){
+        System.out.println("DISPATCH============ "+queuedForDispatch.size() +" to "+listeningCallbacks.size());
         ArrayList<Device> dispatch = new ArrayList<>();
         queuedForDispatch.stream()
                 .forEach((d) ->{
@@ -208,8 +213,7 @@ public class MulticastDNSDevices implements DiscoveryService {
                             listeningCallbacks.remove(callback);
                         }
                     } catch (Exception e){
-                        LOGGER.log(Level.SEVERE, "Failed to dispatch to listening callback", e);
-
+                        LOGGER.log(Level.WARNING, "Failed to dispatch to listening callback", e);
                     }
                 });
         addAllDevices(dispatch);
