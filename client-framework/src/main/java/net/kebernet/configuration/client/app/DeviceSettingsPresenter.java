@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -40,7 +41,7 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
     private List<SettingValue> values;
     private AtomicInteger responseCount = new AtomicInteger();
     private AppFlow appFlow;
-    private List<SettingValue> toSave = new ArrayList<>();
+    private List<SettingValue> toSave = new CopyOnWriteArrayList<>();
     private Device device;
 
     @Inject
@@ -84,9 +85,10 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
     }
 
     @Override
-    public synchronized void onSaveClicked() {
+    public void onSaveClicked() {
         ArrayList<SettingValue> toSend = new ArrayList<>(toSave);
-        toSave.clear();
+        toSave.removeAll(toSend);
+
         service.saveSettings(this.device.getName(), this.device.getSettingsValuesUrl(), toSend, (didSave)->{
             if(didSave){
                 appFlow.showDeviceList();
