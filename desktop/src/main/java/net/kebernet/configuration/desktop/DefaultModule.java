@@ -26,8 +26,15 @@ import net.kebernet.configuration.client.service.CompositeDiscoveryService;
 import net.kebernet.configuration.client.service.DiscoveryService;
 import net.kebernet.configuration.client.service.SettingsService;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Dagger Module.
@@ -40,10 +47,25 @@ import java.security.KeyStore;
 )
 public class DefaultModule {
 
+    private static final Logger LOGGER = Logger.getLogger(DefaultModule.class.getCanonicalName());
+
     @Provides
     @Singleton
     public KeyStore factory(){
-        return null;
+        try {
+            KeyStore ks =  KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(null, null);
+            return ks;
+        } catch (IOException | CertificateException | NoSuchAlgorithmException |KeyStoreException e) {
+            LOGGER.log(Level.SEVERE, "Failed to create keystore.", e);
+            return null;
+        }
+    }
+
+    @Provides
+    @Singleton
+    public HttpClient.AuthenticationCallback authenticationCallback(){
+        return new BasicLoginDialog();
     }
 
     @Provides

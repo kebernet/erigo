@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Created by rcooper on 7/20/17.
@@ -41,7 +42,8 @@ public class RequireSslFilter implements Filter {
         if(request instanceof HttpServletRequest && response instanceof HttpServletResponse){
             HttpServletResponse resp = (HttpServletResponse) response;
             HttpServletRequest req = (HttpServletRequest) request;
-            if(!req.getScheme().equals("https")){
+            String path = req.getPathInfo();
+            if(!Objects.equals("/device", path) && !req.getScheme().equals("https")){
                 String url = "https://" + req.getServerName() +":"+ Values.HTTPS_PORT +
                         req.getContextPath() + req.getServletPath();
                 if (req.getPathInfo() != null) {

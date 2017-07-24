@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package net.kebernet.configuration.client.app;
 
 import net.kebernet.configuration.client.model.Device;

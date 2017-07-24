@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -57,6 +58,11 @@ public class PamFilter implements Filter {
         if(response instanceof HttpServletResponse && request instanceof HttpServletRequest){
             HttpServletResponse resp = (HttpServletResponse) response;
             HttpServletRequest req = (HttpServletRequest) request;
+            String path = ((HttpServletRequest)request).getPathInfo();
+            if(Objects.equals("/device", path)){
+                chain.doFilter(request, response);
+                return;
+            }
             header = req.getHeader("Authorization");
             if(header == null){
                 resp.setHeader("WWW-Authenticate", "Basic realm=\"Erigo Configuration Service\"");

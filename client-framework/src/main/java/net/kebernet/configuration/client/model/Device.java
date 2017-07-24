@@ -128,11 +128,11 @@ public class Device {
                 .add("name", name)
                 .add("type", type)
                 .add("manufacturer", manufacturer)
-                .add("thumbnailUrl", getThumbnailUrl())
-                .add("settingsUrl", getSettingsUrl())
-                .add("settingsValuesUrl", getSettingsValuesUrl())
-                .add("webUiUrl", getWebUiUrl())
-                .add("tlsCertificateUrl",getTlsCertificateUrl())
+                .add("thumbnailUrl", thumbnailUrl)
+                .add("settingsUrl", settingsUrl)
+                .add("settingsValuesUrl", settingsValuesUrl)
+                .add("webUiUrl", webUiUrl)
+                .add("tlsCertificateUrl", tlsCertificateUrl)
                 .toString();
     }
 

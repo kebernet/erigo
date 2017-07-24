@@ -28,7 +28,7 @@ import java.awt.*;
  */
 public class DeviceListItem {
     private final Device device;
-    private JLabel name;
+    private JLabel id;
     private JLabel type;
     private JLabel manufacturer;
     private JLabel address;
@@ -51,7 +51,7 @@ public class DeviceListItem {
 
     public DeviceListItem(Device device) {
         this.device = device;
-        this.name.setText(device.getName());
+        this.id.setText(device.getName());
         this.type.setText(String.format("(%s)", device.getType()));
         this.manufacturer.setText(device.getManufacturer());
         this.address.setText(device.getAddress());
@@ -82,11 +82,11 @@ public class DeviceListItem {
     private void $$$setupUI$$$() {
         root = new JPanel();
         root.setLayout(new GridLayoutManager(5, 4, new Insets(2, 2, 2, 8), -1, -1));
-        name = new JLabel();
-        name.setFont(new Font(name.getFont().getName(), Font.BOLD, 22));
-        name.setForeground(new Color(-16777216));
-        name.setText("Label");
-        root.add(name, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        id = new JLabel();
+        id.setFont(new Font(id.getFont().getName(), Font.BOLD, 22));
+        id.setForeground(new Color(-16777216));
+        id.setText("Label");
+        root.add(id, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         manufacturer = new JLabel();
         manufacturer.setForeground(new Color(-10526881));
         manufacturer.setText("Label");

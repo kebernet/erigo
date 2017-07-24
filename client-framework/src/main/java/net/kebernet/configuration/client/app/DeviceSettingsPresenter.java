@@ -54,16 +54,14 @@ public class DeviceSettingsPresenter implements DeviceSettingsView.SaveCallback,
         view.showLoading();
         service.listSettings(device.getName(), device.getSettingsUrl(), (settings)->{
             this.settings = settings;
-            if(responseCount.incrementAndGet() == 2) {
-                render();
-            }
+            service.listValues(device.getName(), device.getSettingsValuesUrl(),  (values)->{
+                this.values = values;
+                    view.hideLoading();
+                    render();
+            });
+
         });
-        service.listValues(device.getName(), device.getSettingsValuesUrl(),  (values)->{
-            this.values = values;
-            if (responseCount.incrementAndGet() == 2) {
-                render();
-            }
-        });
+
     }
 
     public void unBind(){

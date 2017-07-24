@@ -15,6 +15,7 @@
 #
 
 server:
+  maxThreads: 64
   applicationConnectors:
     - type: http
       port: 13131

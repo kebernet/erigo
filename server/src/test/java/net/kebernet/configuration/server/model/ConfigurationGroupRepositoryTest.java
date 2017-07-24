@@ -57,9 +57,10 @@ public class ConfigurationGroupRepositoryTest {
         // validate we don't reload
         assertFalse(repository.load());
         // touch a file
-        new File(etc.getAbsolutePath() + "/configs/host/group.json").setLastModified(System.currentTimeMillis());
+        boolean didTouch = new File(etc.getAbsolutePath() + "/configs/host/group.json").setLastModified(System.currentTimeMillis());
         // validate reload.
-        assertTrue(repository.load());
+        boolean loaded = didTouch && repository.load();
+        assertTrue(loaded);
 
     }
 

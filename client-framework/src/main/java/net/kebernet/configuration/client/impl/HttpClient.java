@@ -26,7 +26,9 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -38,7 +40,13 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
@@ -57,29 +65,96 @@ public class HttpClient {
     private static final ConcurrentHashMap<String, String> PERMANENT_REDIRECTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, AuthenticationToken> TOKEN_MAP = new ConcurrentHashMap<>();
     private final CertificateTool certificateTool;
+    private final SSLSocketFactory sslSocketFactory;
     private AuthenticationCallback authenticationCallback;
     private ErrorCallback errorCallback;
-    private final SSLSocketFactory sslSocketFactory;
 
     @Inject
-    public HttpClient(KeyStore keyStore){
-        System.out.println("HttpClient");
-        if(keyStore == null){
+    public HttpClient(KeyStore keyStore, AuthenticationCallback authenticationCallback) {
+        if (keyStore == null) {
             LOGGER.warning("No keystore for SSL.");
             this.certificateTool = null;
         } else {
             this.certificateTool = new CertificateTool(keyStore);
         }
-        SSLContext ctx =null;
+        this.authenticationCallback = authenticationCallback;
+        SSLContext ctx = null;
         try {
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init((KeyStore) null);
+            X509TrustManager defaultTm = null;
+
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    defaultTm = (X509TrustManager) tm;
+                    break;
+                }
+            }
+
+
+            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keyStore);
-            ctx = SSLContext.getInstance("TLSv1");
-            ctx.init(null, tmf.getTrustManagers(), null);
-        } catch (KeyManagementException |KeyStoreException |NoSuchAlgorithmException e) {
+            X509TrustManager myTm = null;
+            for (TrustManager tm : tmf.getTrustManagers()) {
+                if (tm instanceof X509TrustManager) {
+                    myTm = (X509TrustManager) tm;
+                    break;
+                }
+            }
+
+            X509TrustManager finalDefaultTm = defaultTm;
+            X509TrustManager finalMyTm = myTm;
+            X509TrustManager delegatingTM = new X509TrustManager() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    ArrayList<X509Certificate> certs = new ArrayList<>();
+                    try {
+                        Enumeration<String> a = keyStore.aliases();
+                        while(a.hasMoreElements()){
+                            Certificate c = keyStore.getCertificate(a.nextElement());
+                            if(c instanceof X509Certificate) {
+                                certs.add((X509Certificate) c);
+                            }
+                        }
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+                    certs.addAll(Arrays.asList(finalMyTm.getAcceptedIssuers()));
+                    return certs.toArray(new X509Certificate[certs.size()]);
+
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {
+                    try {
+                        for(X509Certificate c: chain){
+                            if(keyStore.getCertificateAlias(c) != null){
+                                return;
+                            }
+                        }
+                        finalMyTm.checkServerTrusted(chain, authType);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.INFO, "Certificate miss on internal keystore.", e);
+                        finalDefaultTm.checkServerTrusted(chain, authType);
+                    }
+                }
+
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain,
+                                               String authType) throws CertificateException {
+                    // If you're planning to use client-cert auth,
+                    // do the same as checking the server.
+                    finalDefaultTm.checkClientTrusted(chain, authType);
+                }
+            };
+            ctx = SSLContext.getInstance("TLS");
+            ctx.init(null, new TrustManager[] { delegatingTM }, null);
+        } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize SSL with keystore.");
         }
-        if(ctx != null){
+
+        if (ctx != null) {
             sslSocketFactory = ctx.getSocketFactory();
         } else {
             sslSocketFactory = null;
@@ -116,15 +191,16 @@ public class HttpClient {
                 .append(uri.getPort()).toString();
     }
 
-    public static void clearCachedAuthentication(){
+    public static void clearCachedAuthentication() {
         TOKEN_MAP.clear();
     }
 
     /**
      * Makes a get request.
-     * @param deviceName  Discovered name of the device for the url.
-     * @param url      The URL to hit.
-     * @param callback A callback with the result.
+     *
+     * @param deviceName Discovered name of the device for the url.
+     * @param url        The URL to hit.
+     * @param callback   A callback with the result.
      */
     public void getToStream(String deviceName, String url, Consumer<InputStreamReader> callback) {
         getToStream(deviceName, url, null, callback);
@@ -145,7 +221,8 @@ public class HttpClient {
                             HostnameVerifier defaultVerifier =
                                     HttpsURLConnection.getDefaultHostnameVerifier();
                             return defaultVerifier.verify(s, sslSession) ||
-                                    defaultVerifier.verify(deviceName, sslSession);
+                                    defaultVerifier.verify(deviceName, sslSession) ||
+                                    s.equals(u.getHost());
                         });
 
                     }
@@ -179,16 +256,20 @@ public class HttpClient {
                     }
                     callback.accept(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8));
 
-                } catch(SSLHandshakeException ce){
+                } catch (SSLHandshakeException ce) {
                     try {
-                        if(this.certificateTool != null && this.certificateTool.addCertificatesForUrl(url)){
+                        if (this.certificateTool != null && this.certificateTool.addCertificatesForUrl(url)) {
                             getToStream(deviceName, url, authenticationToken, callback);
+                        } else {
+                            maybeSendError("There is no configured SSL/TLS support to communicate with " + url);
                         }
                     } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "Couldn't get certificate for "+url);
+                        LOGGER.log(Level.SEVERE, "Couldn't get certificate for " + url);
+                        maybeSendError("There was a problem communicating securely with " + url);
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, "Failed to fetch " + url, e);
+                    maybeSendError("Failed to read from "+url+" ("+e.getMessage()+")");
                 }
             });
 
@@ -321,11 +402,20 @@ public class HttpClient {
                     .add("password", password)
                     .toString();
         }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
     }
 
     /**
      * An authentication token based on a bearer token.
      */
+    @SuppressWarnings("unused")
     public static class BearerAuthenticationToken implements AuthenticationToken {
 
         private final String token;
@@ -383,7 +473,7 @@ public class HttpClient {
                         callback.accept(nextToken);
                     }
                 });
-            } catch(Exception e){
+            } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, null, e);
             }
         }

@@ -68,13 +68,13 @@ public class DefaultFileExporter {
         File keystoreFile = new File(settingsDirectory, "keystore.jks");
         if (!keystoreFile.exists()) {
             String hostname = valueRepository.getDeviceName();
-            String ip = "";
+            StringBuilder ip = new StringBuilder();
             try {
                 for (byte b : InetAddress.getLocalHost().getAddress()) {
                     if (ip.length() > 0) {
-                        ip += ".";
+                        ip.append('.');
                     }
-                    ip += Integer.toString(b & 0xFF);
+                    ip.append(Integer.toString(b & 0xFF));
                 }
             } catch (UnknownHostException e) {
                 e.printStackTrace();

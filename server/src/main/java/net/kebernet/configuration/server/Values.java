@@ -19,6 +19,6 @@ package net.kebernet.configuration.server;
  * Created by rcooper on 7/20/17.
  */
 public abstract class Values {
-    public static int HTTP_PORT = 13131;
-    public static int HTTPS_PORT = 13132;
+    public static final int HTTP_PORT = 13131;
+    public static final int HTTPS_PORT = 13132;
 }

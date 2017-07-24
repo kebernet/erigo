@@ -35,8 +35,8 @@ public class GroupView {
     private final Map<String, String> values;
     private final DeviceSettingsView.SettingsChangedCallback callback;
     JPanel root;
-    private JLabel description;
     private JPanel fields;
+    private JLabel name;
 
 
     public GroupView(SettingViewFactory factory, Group group, Map<String, String> values, DeviceSettingsView.SettingsChangedCallback callback) {
@@ -48,7 +48,7 @@ public class GroupView {
     }
 
     private void render() {
-        this.description.setText(group.getDescription());
+        this.name.setText(group.getDescription());
         this.fields.setLayout(new MigLayout("wrap 2", "[30%][grow]"));
         group.getSettings().forEach((setting) -> {
             JLabel label = new JLabel(setting.getName());
@@ -93,9 +93,9 @@ public class GroupView {
     private void $$$setupUI$$$() {
         root = new JPanel();
         root.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        description = new JLabel();
-        description.setText("Label");
-        root.add(description, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
+        name = new JLabel();
+        name.setText("Label");
+        root.add(name, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
         final JScrollPane scrollPane1 = new JScrollPane();
         root.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         fields = new JPanel();

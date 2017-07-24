@@ -52,7 +52,12 @@ public class CertificateTool {
 
     public boolean addCertificatesToKeyStore(@Nonnull List<X509Certificate> certificates) throws KeyStoreException {
         for(X509Certificate c: certificates){
-            trustStore.setCertificateEntry("imported-"+c.getSerialNumber(), c);
+            try {
+                KeyStore.TrustedCertificateEntry trust = new KeyStore.TrustedCertificateEntry(c);
+                trustStore.setEntry("imported-" + c.getSerialNumber(), trust, null);
+            } catch (Exception e){
+                throw new RuntimeException(e);
+            }
         }
         return true;
     }
