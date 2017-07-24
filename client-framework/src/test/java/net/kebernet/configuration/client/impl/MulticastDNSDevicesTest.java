@@ -17,7 +17,11 @@ package net.kebernet.configuration.client.impl;
 
 import com.google.common.util.concurrent.SettableFuture;
 import net.kebernet.configuration.client.model.Device;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +30,20 @@ import static org.junit.Assert.assertTrue;
  * Created by rcooper on 7/6/17.
  */
 public class MulticastDNSDevicesTest {
+
+    private static int port = MockServer.randomPort();
+    private static MockServer mockServer;
+
+    @BeforeClass
+    public static void setup() throws Exception {
+        mockServer = new MockServer(port);
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        mockServer.stop();
+    }
+
 
 
     @Test
@@ -41,7 +59,7 @@ public class MulticastDNSDevicesTest {
             return true;
         });
         devices.startListening();
-        MockServer server = new MockServer(MockServer.randomPort());
+
         Device device = deviceFuture.get();
         assertTrue(device != null);
         assertTrue(device.getAddress().startsWith("http://"));
@@ -54,11 +72,11 @@ public class MulticastDNSDevicesTest {
                     .findFirst().get());
             return false;
         });
-        device = deviceFuture.get();
+        device = deviceFuture.get(1, TimeUnit.MINUTES);
         assertTrue(device != null);
         assertTrue(device.getAddress().startsWith("http://"));
         assertEquals("http://www.kebernet.net/_/rsrc/1264535093579/Home/therespie.jpg", device.getThumbnailUrl());
-        server.server.stop();
+
         devices.stopListening();
     }
 
