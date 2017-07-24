@@ -42,7 +42,9 @@ sourceSets.test.runtimeClasspath += configurations.j2oCp
 
 Properties readProperties(File f){
     Properties p = new Properties()
-    p.load(f.newDataInputStream())
+    if(f.exists()) {
+        p.load(f.newDataInputStream())
+    }
     return p
 }
 
@@ -102,17 +104,18 @@ task copySources(dependsOn: extractJ2o) {
     }
 
 }
-
-task j2objc(dependsOn: copySources) {
-    doFirst {
-        println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
-    }
-    doLast {
-        exec {
-            executable local["j2objc.home"] + '/j2objc'
-            args listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
+if(  local["j2objc.home"] != null){
+    task j2objc(dependsOn: copySources) {
+        doFirst {
+            println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
+        }
+        doLast {
+            exec {
+                executable local["j2objc.home"] + '/j2objc'
+                args listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
+            }
         }
     }
-}
 
-build.dependsOn j2objc
+    build.dependsOn j2objc
+}
