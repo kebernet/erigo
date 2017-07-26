@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server.http;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -43,29 +44,39 @@ public class RemoteAccessFilter implements Filter {
     @Inject
     public RemoteAccessFilter(@Named("hostMatchRegex") String hostMatchRegex) {
         this.hostMatchRegex = hostMatchRegex;
-    }
-
-    @Override
-    public void init(FilterConfig config) throws ServletException {
         try {
             localAddresses.add(InetAddress.getLocalHost().getHostAddress());
             for (InetAddress inetAddress : InetAddress.getAllByName("localhost")) {
                 localAddresses.add(inetAddress.getHostAddress());
             }
         } catch (IOException e) {
-            throw new ServletException("Unable to lookup local addresses");
+            throw new RuntimeException("Unable to lookup local addresses");
         }
     }
 
     @Override
+    public void init(FilterConfig config) throws ServletException {
+
+    }
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
-        if (localAddresses.contains(request.getRemoteAddr()) || request.getRemoteAddr().matches(hostMatchRegex)) {
+        if (matches(request.getRemoteHost()) || matches(request.getRemoteAddr())) {
             chain.doFilter(request, response);
-        } else if(response instanceof HttpServletResponse) {
+        } else if (response instanceof HttpServletResponse) {
             ((HttpServletResponse) response).setStatus(403);
         } else {
             throw new ServletException("What the hell is going on here?");
         }
+    }
+
+    private boolean matches(@Nullable String host) {
+        return host != null &&
+                (
+                        localAddresses.contains(host) ||
+                        hostMatchRegex == null ||
+                        host.matches(hostMatchRegex)
+                );
     }
 
     @Override

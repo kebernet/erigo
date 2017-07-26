@@ -29,7 +29,7 @@ public class URIUtil {
         try {
             URI uri = new URI(base);
             return uri.resolve(new URI(relative)).toString();
-        } catch (URISyntaxException e) {
+        } catch (NullPointerException | URISyntaxException e) {
             LOGGER.log(Level.WARNING, "Couldn't resolve "+relative+" from "+base);
             return relative;
         }

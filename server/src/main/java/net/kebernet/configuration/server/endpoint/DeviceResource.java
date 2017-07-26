@@ -85,7 +85,7 @@ public class DeviceResource {
         value.setThumbnailUrl(valueRepository.findValue("host_thumbnailUrl", DEFAULT_ICON_URL));
         value.setSettingsUrl("/settings");
         value.setManufacturer(valueRepository.findValue("host_manufacturer", "Raspberry Pi"));
-        value.setType(valueRepository.findValue("host_type", "Raspberry Pi"));
+        value.setType(valueRepository.findValue("host_type", parameters.getDeviceType()));
         value.setWebUiUrl(valueRepository.findValue("host_webUiUrl", null));
         value.setTlsCertificateUrl(valueRepository.findValue("host_tlsCertificateUrl", null));
         value.setSettingsValuesUrl("/settings/values");

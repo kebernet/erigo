@@ -64,7 +64,7 @@ public class WifiConfigWriter extends ConfigWriter {
         try {
             mac = NetworkInterface.getByName(startupParameters.getWlanInterface()).getHardwareAddress();
         } catch(Exception e){
-            LOGGER.log(Level.WARNING, "Failed to get wlan interface.", e);
+            LOGGER.log(Level.WARNING, "Failed to get "+startupParameters.getWlanInterface()+" interface. Falling back to localhost", e);
             try {
                 mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
             } catch(Exception le) {

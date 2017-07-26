@@ -62,7 +62,7 @@ public class SettingsResource {
 
 
     @GET
-    public Settings getSettings() throws IOException {
+    public Settings findSettings() throws IOException {
         Settings settings = new Settings();
         settings.setDescription(values.findValue("host_description", ""));
         if(repository.load()){
