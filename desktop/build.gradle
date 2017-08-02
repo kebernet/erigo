@@ -50,6 +50,7 @@ applicationDefaultJvmArgs = ["-Xmx256m"]
 distributions {
     main {
         baseName = "Erigo-universal"
+        applicationName = 'erigo'
         contents {
 
         }
@@ -88,7 +89,7 @@ task packrMac(dependsOn: [downloadMacJdk, shadowJar]) {
         config.verbose = true
         config.jdk = file(rootProject.file("jdks/mac-jdk.zip"))
         config.outDir = file("build/packr/mac/Erigo.app")
-        config.iconResource = file("src/main/mac/logo.icns")
+        config.iconResource = file("src/main/mac/icons.icns")
         new Packr().pack(config)
     }
 }
