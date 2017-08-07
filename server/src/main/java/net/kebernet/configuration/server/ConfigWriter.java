@@ -35,6 +35,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -47,39 +48,78 @@ public class ConfigWriter {
     static final Logger LOGGER = Logger.getLogger(WifiConfigWriter.class.getCanonicalName());
     final File storageDirectory;
     final File targetDirectory;
+    private final ScriptExecutor executor;
 
 
     @Inject
-    public ConfigWriter(@Named("targetDirectory") File targetDirectory, @Named("storageDirectory") File storageDirectory){
+    public ConfigWriter(@Named("targetDirectory") File targetDirectory, @Named("storageDirectory") File storageDirectory, ScriptExecutor executor){
         this.storageDirectory = storageDirectory;
         this.targetDirectory = targetDirectory;
+        this.executor = executor;
         renderContext.put("erigo.targetDirectory", targetDirectory.getAbsolutePath());
         renderContext.put("erigo.storageDirectory", storageDirectory.getAbsolutePath());
     }
 
 
     public void executeApplyGroups(List<ConfigurationGroup> groups, List<SettingValue> settings){
+        settings.forEach((s)->renderContext.put(s.getName(), s.getValue()));
+        groups.forEach(this::applyGroup);
+    }
 
+    private void applyGroup(ConfigurationGroup g) {
+        g.getBeforeScriptTemplate().ifPresent((f)-> doScript(f, g.getName(), "before"));
+        g.getTemplateFiles().parallelStream()
+                .forEach((f)->transformFile(f, g.getName()));
+        g.getAfterScriptTemplate().ifPresent((f)-> doScript(f, g.getName(), "after"));
+    }
+
+    private void doScript(String f, String parent, String lifecycle) {
+        File source = new File(new File(storageDirectory, parent), f);
+        File transformed = new File(targetDirectory, parent+"-"+lifecycle);
+        try {
+            transformFileToTarget( source , transformed);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to transform "+source.getAbsolutePath());
+            throw new RuntimeException(e);
+        }
+        this.executor.runScript(transformed.getAbsolutePath());
     }
 
 
     void transformAndWrite(File templateFolder, File destinationFolder) throws IOException {
         for (String file : FileUtils.listAllRelativeFilePaths(templateFolder)) {
-            File source = new File(templateFolder, file);
-            File target = new File(destinationFolder, file);
-            if (!target.getParentFile().mkdirs()) {
-                LOGGER.info("Didn't mkdirs " + target.getParentFile());
-            }
+            transformFile(templateFolder, destinationFolder, file);
+        }
+    }
 
-            LOGGER.info("Transforming from "+source.getAbsolutePath()+" to "+target.getAbsolutePath());
-            try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
-                Mustache mustache = factory.compile(
-                        new InputStreamReader(new FileInputStream(source), Charsets.UTF_8)
-                        , file);
+    private void transformFile(String file, String parent)  {
+        try {
+            this.transformFile(new File(storageDirectory, parent), targetDirectory, file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to transform "+file);
+            throw new RuntimeException(e);
+        }
+    }
 
-                mustache.execute(output, renderContext);
-                output.close();
-            }
+    private void transformFile(File templateFolder, File destinationFolder, String file) throws IOException {
+        File source = new File(templateFolder, file);
+        File target = new File(destinationFolder, file);
+        transformFileToTarget(source, target);
+    }
+
+    private void transformFileToTarget(File source, File target) throws IOException {
+        if (!target.getParentFile().mkdirs()) {
+            LOGGER.info("Didn't mkdirs " + target.getParentFile());
+        }
+
+        LOGGER.info("Transforming from "+source.getAbsolutePath()+" to "+target.getAbsolutePath());
+        try (Writer output = new OutputStreamWriter(new FileOutputStream(target), Charsets.UTF_8)) {
+            Mustache mustache = factory.compile(
+                    new InputStreamReader(new FileInputStream(source), Charsets.UTF_8)
+                    , source.getAbsolutePath());
+
+            mustache.execute(output, renderContext);
+            output.close();
         }
     }
 }

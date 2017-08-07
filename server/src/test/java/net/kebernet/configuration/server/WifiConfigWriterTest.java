@@ -21,6 +21,8 @@ import org.junit.Test;
 import java.io.File;
 import java.util.logging.Logger;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * Created by rcooper on 6/15/17.
  */
@@ -41,8 +43,9 @@ public class WifiConfigWriterTest {
         params.setcSubnet(26);
         params.setStorageDirectory(etc.getAbsolutePath());
         params.setTargetDirectory(dir.getAbsolutePath());
+        ScriptExecutor executor = mock(ScriptExecutor.class);
         try {
-            WifiConfigWriter writer = new WifiConfigWriter(params);
+            WifiConfigWriter writer = new WifiConfigWriter(params, executor);
             writer.writeAdHocNetworkConfig();
 
         } catch(Exception e){

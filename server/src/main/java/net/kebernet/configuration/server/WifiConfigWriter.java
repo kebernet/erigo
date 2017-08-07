@@ -34,8 +34,8 @@ import java.util.logging.Level;
 public class WifiConfigWriter extends ConfigWriter {
 
     @Inject
-    public WifiConfigWriter(StartupParameters startupParameters) {
-        super(new File(startupParameters.getTargetDirectory()), new File(startupParameters.getStorageDirectory()));
+    public WifiConfigWriter(StartupParameters startupParameters, ScriptExecutor executor) {
+        super(new File(startupParameters.getTargetDirectory()), new File(startupParameters.getStorageDirectory()), executor);
         renderContext.put("deviceName", startupParameters.getDeviceType());
         renderContext.put("wlanInterface", startupParameters.getWlanInterface());
         renderContext.put("cSubnet", startupParameters.getcSubnet());

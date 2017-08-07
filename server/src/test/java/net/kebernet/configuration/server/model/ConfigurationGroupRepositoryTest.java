@@ -51,7 +51,7 @@ public class ConfigurationGroupRepositoryTest {
         assertTrue(groups.stream().map(ConfigurationGroup::getName).collect(Collectors.toSet()).contains("host"));
         assertEquals("wireless", groups.get(0).getName());
         assertEquals("host", groups.get(1).getName());
-        assertNotNull(groups.get(1).getBeforeScriptTemplate());
+        assertTrue(groups.get(1).getBeforeScriptTemplate().isPresent());
         assertEquals(1, groups.get(1).getTemplateFiles().size());
         // validate we don't reload
         assertFalse(repository.load());

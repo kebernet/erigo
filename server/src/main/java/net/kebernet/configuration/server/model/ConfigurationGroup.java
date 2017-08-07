@@ -20,6 +20,7 @@ import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.Setting;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -45,16 +46,16 @@ public class ConfigurationGroup {
         this.name = name;
     }
 
-    public String getBeforeScriptTemplate() {
-        return beforeScriptTemplate;
+    public Optional<String> getBeforeScriptTemplate() {
+        return Optional.ofNullable(beforeScriptTemplate);
     }
 
     public void setBeforeScriptTemplate(String beforeScriptTemplate) {
         this.beforeScriptTemplate = beforeScriptTemplate;
     }
 
-    public String getAfterScriptTemplate() {
-        return afterScriptTemplate;
+    public Optional<String> getAfterScriptTemplate() {
+        return Optional.ofNullable(afterScriptTemplate);
     }
 
     public void setAfterScriptTemplate(String afterScriptTemplate) {
