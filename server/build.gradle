@@ -52,3 +52,5 @@ jacocoTestReport {
 shadowJar {
     classifier = "all"
 }
+
+tasks.build.dependsOn shadowJar

@@ -40,11 +40,11 @@ public class CompositeDiscoveryService implements DiscoveryService {
         this.internal = internal;
         for(DiscoveryService devices : internal){
             devices.listenForDevices(result -> {
-                for(DeviceListCallback callback : listeners){
+                listeners.parallelStream().forEach((callback)->{
                     if(!callback.onDevices(result)){
                         listeners.remove(callback);
                     }
-                }
+                });
                 return true;
             });
         }
@@ -70,9 +70,7 @@ public class CompositeDiscoveryService implements DiscoveryService {
                     }
                 }
                 ArrayList<Device> total = new ArrayList<>();
-                for(List l : results){
-                    total.addAll((List<Device>) l);
-                }
+                Arrays.stream(results).forEach(total::addAll);
                 callback.onDevices(total);
                 return false;
             });

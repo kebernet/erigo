@@ -131,6 +131,8 @@ public class DefaultFileExporter {
                                 output);
                     } catch (IOException e) {
                         LOGGER.log(Level.SEVERE, "Failed to write file "+target.getAbsolutePath(), e);
+                    } catch(NullPointerException e){
+                        LOGGER.log(Level.SEVERE, "Failed to handle "+prefix+file, e);
                     }
                 });
     }
@@ -139,7 +141,8 @@ public class DefaultFileExporter {
         return classpathScanner.scan(
                 (resource) ->
                         resource.getFullPath().contains(path) &&
-                                !(resource instanceof Directory)
+                        !resource.getFullPath().contains("Test"+path) &&
+                        !(resource instanceof Directory)
         )
                 .stream()
                 .map(pe -> pe.getFullPath().substring(pe.getFullPath().indexOf(path) + path.length()))

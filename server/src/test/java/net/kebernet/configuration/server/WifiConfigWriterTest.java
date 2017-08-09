@@ -40,7 +40,7 @@ public class WifiConfigWriterTest {
         new DefaultFileExporter(etc, new SettingValueRepository(etc, "testThing")).exportMissingFiles();
         StartupParameters params = new StartupParameters();
         params.setDeviceType("Unit Test Device");
-        params.setcSubnet(26);
+        params.setCSubnet(26);
         params.setStorageDirectory(etc.getAbsolutePath());
         params.setTargetDirectory(dir.getAbsolutePath());
         ScriptExecutor executor = mock(ScriptExecutor.class);

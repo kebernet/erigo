@@ -38,7 +38,7 @@ public class WifiConfigWriter extends ConfigWriter {
         super(new File(startupParameters.getTargetDirectory()), new File(startupParameters.getStorageDirectory()), executor);
         renderContext.put("deviceName", startupParameters.getDeviceType());
         renderContext.put("wlanInterface", startupParameters.getWlanInterface());
-        renderContext.put("cSubnet", startupParameters.getcSubnet());
+        renderContext.put("cSubnet", startupParameters.getCSubnet());
         renderContext.put("deviceType", startupParameters.getDeviceType());
         String networkName = computeDefaultName(startupParameters)+".erigo";
         renderContext.put( "networkName", networkName);
@@ -46,14 +46,32 @@ public class WifiConfigWriter extends ConfigWriter {
 
 
     public void writeAdHocNetworkConfig() throws IOException {
+        doScript("before.sh", "adhoc", "adhoc", "before");
         transformAndWrite(new File(storageDirectory, "/adhoc"), targetDirectory);
+        doScript("after.sh", "adhoc", "adhoc", "after");
     }
 
     public void writeRegularNetworkConfig(List<SettingValue> settingValueList) throws IOException {
+        doScript("before.sh", "wifi", "wifi", "before");
         settingValueList.forEach((v)->{
             renderContext.put(v.getName(), v.getValue());
         });
         transformAndWrite(new File(storageDirectory, "/wifi"), targetDirectory);
+        doScript("after.sh", "wifi", "wifi", "after");
+    }
+
+    private void transformAndWrite(File templateFolder, File destinationFolder) throws IOException {
+        FileUtils.listAllRelativeFilePaths(templateFolder)
+                .parallelStream()
+                .filter(f-> !"after.sh".equals(f) &&!"before.sh".equals(f))
+                .forEach(f -> {
+                    try {
+                        transformFile(templateFolder, destinationFolder, f);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.WARNING, "Couldn't transform", f);
+                    }
+                });
+
     }
 
 

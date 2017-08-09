@@ -67,17 +67,18 @@ public class ConfigWriter {
     }
 
     private void applyGroup(ConfigurationGroup g) {
-        g.getBeforeScriptTemplate().ifPresent((f)-> doScript(f, g.getName(), "before"));
+        String parent = "configs/"+g.getName();
+        g.getBeforeScriptTemplate().ifPresent((f)-> doScript(f, parent, g.getName(), "before"));
         g.getTemplateFiles().parallelStream()
-                .forEach((f)->transformFile(f, g.getName()));
-        g.getAfterScriptTemplate().ifPresent((f)-> doScript(f, g.getName(), "after"));
+                .forEach((f)->transformFile(f,parent));
+        g.getAfterScriptTemplate().ifPresent((f)-> doScript(f, parent, g.getName(), "after"));
     }
 
-    private void doScript(String f, String parent, String lifecycle) {
+    protected void doScript(String f, String parent, String groupName, String lifecycle) {
         File source = new File(new File(storageDirectory, parent), f);
-        File transformed = new File(targetDirectory, parent+"-"+lifecycle);
+        File transformed = new File(targetDirectory, groupName+"-"+lifecycle);
         try {
-            transformFileToTarget( source , transformed);
+            transformFileToTarget(source, transformed);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to transform "+source.getAbsolutePath());
             throw new RuntimeException(e);
@@ -85,12 +86,6 @@ public class ConfigWriter {
         this.executor.runScript(transformed.getAbsolutePath());
     }
 
-
-    void transformAndWrite(File templateFolder, File destinationFolder) throws IOException {
-        for (String file : FileUtils.listAllRelativeFilePaths(templateFolder)) {
-            transformFile(templateFolder, destinationFolder, file);
-        }
-    }
 
     private void transformFile(String file, String parent)  {
         try {
@@ -101,7 +96,7 @@ public class ConfigWriter {
         }
     }
 
-    private void transformFile(File templateFolder, File destinationFolder, String file) throws IOException {
+    protected void transformFile(File templateFolder, File destinationFolder, String file) throws IOException {
         File source = new File(templateFolder, file);
         File target = new File(destinationFolder, file);
         transformFileToTarget(source, target);

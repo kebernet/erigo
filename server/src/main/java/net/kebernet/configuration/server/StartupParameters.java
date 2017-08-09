@@ -62,11 +62,11 @@ public class StartupParameters {
         this.deviceType = deviceType;
     }
 
-    public int getcSubnet() {
+    public int getCSubnet() {
         return cSubnet;
     }
 
-    public void setcSubnet(int cSubnet) {
+    public void setCSubnet(int cSubnet) {
         this.cSubnet = cSubnet;
     }
 
