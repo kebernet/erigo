@@ -83,7 +83,7 @@ public class ConfigWriter {
             LOGGER.log(Level.SEVERE, "Failed to transform "+source.getAbsolutePath());
             throw new RuntimeException(e);
         }
-        this.executor.runScript(transformed.getAbsolutePath());
+        this.executor.runAndDeleteScript(transformed.getAbsolutePath());
     }
 
 

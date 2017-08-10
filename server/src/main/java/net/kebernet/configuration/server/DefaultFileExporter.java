@@ -47,6 +47,7 @@ public class DefaultFileExporter {
 
     private final Scanner classpathScanner = new Scanner();
     private final SettingValueRepository valueRepository;
+    private boolean alwaysWrite = false;
 
     @Inject
     public DefaultFileExporter(@Named("storageDirectory") File settingsDirectory, SettingValueRepository valueRepository) {
@@ -63,6 +64,10 @@ public class DefaultFileExporter {
         writeMissingFiles("/wifi");
         writeMissingFiles("/configs");
         checkKeystoreGeneration();
+    }
+
+    public void setAlwaysWrite(boolean alwaysWrite) {
+        this.alwaysWrite = alwaysWrite;
     }
 
     private void checkKeystoreGeneration() {
@@ -119,7 +124,7 @@ public class DefaultFileExporter {
         listResources(prefix).parallelStream()
                 .forEach((file) -> {
                     File target = new File(this.settingsDirectory, prefix + "/" + file);
-                    if (target.exists()) {
+                    if (!alwaysWrite && target.exists()) {
                         return;
                     }
                     if (!target.getParentFile().mkdirs()) {

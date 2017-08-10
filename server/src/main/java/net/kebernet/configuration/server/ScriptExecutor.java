@@ -17,17 +17,49 @@ package net.kebernet.configuration.server;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 @Singleton
 public class ScriptExecutor {
 
+    private static final Logger LOGGER = Logger.getLogger(ScriptExecutor.class.getCanonicalName());
 
     @Inject
     public ScriptExecutor(){
 
     }
 
-    public void runScript(String path){
+    public void runAndDeleteScript(String path) {
+        LOGGER.info("Executing "+path);
+        File f = new File(path);
+        if (!f.setExecutable(true, true)) {
+            throw new ScriptException("Couldn't make " + path + " executable.", null);
+        }
+        try {
+            int result = new ProcessBuilder(f.getAbsolutePath())
+                    .inheritIO()
+                    .directory(f.getParentFile())
+                    .start()
+                    .waitFor();
+            if(result != 0){
+                throw new ScriptException("Got invalid return code ("+result+") running "+path, null);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new ScriptException("Failed to run " + path, e);
+        }
 
+        if(!f.delete()){
+            throw new ScriptException("Failed to delete "+path+" after running", null);
+        }
+    }
+
+
+    public static class ScriptException extends RuntimeException {
+
+        public ScriptException(String message, Throwable cause){
+            super(message, cause);
+        }
     }
 }

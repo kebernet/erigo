@@ -32,7 +32,7 @@ public class RemoteAccessFilterTest {
 
 
     @Test
-    public void doFilterLocalhost() throws Exception {
+    public void testFilterLocalhost() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -50,7 +50,7 @@ public class RemoteAccessFilterTest {
     }
 
     @Test
-    public void doFilterMatch() throws Exception {
+    public void testFilterMatch() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
@@ -68,7 +68,7 @@ public class RemoteAccessFilterTest {
     }
 
     @Test(expected = ServletException.class)
-    public void doUnexpected() throws Exception {
+    public void testUnexpected() throws Exception {
         ServletRequest request = mock(ServletRequest.class);
         ServletResponse response = mock(ServletResponse.class);
         FilterChain chain = mock(FilterChain.class);

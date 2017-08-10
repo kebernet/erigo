@@ -47,6 +47,7 @@ public class ConfigWriterTest {
         File targetDir = new File(System.getProperty("build.dir")+"/test", ConfigWriterTest.class.getSimpleName());
         File storageDir = new File(System.getProperty("test.resources")+"/ConfigWriterTest");
         ScriptExecutor executor = mock(ScriptExecutor.class);
+        doNothing().when(executor).runAndDeleteScript(anyString());
         ConfigWriter writer = new ConfigWriter(targetDir, storageDir, executor);
 
         writer.executeApplyGroups(Collections.singletonList(group), settings);
@@ -56,7 +57,7 @@ public class ConfigWriterTest {
             String read = CharStreams.toString(r);
             assertEquals("Hello, Bob", read.trim());
         }
-        verify(executor, times(2)).runScript(anyString());
+        verify(executor, times(2)).runAndDeleteScript(anyString());
         verifyNoMoreInteractions(executor);
     }
 

@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server.endpoint;
 
+import com.google.common.collect.Multimap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -27,6 +28,7 @@ import net.kebernet.configuration.server.model.SettingValueRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -36,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -92,7 +95,21 @@ public class SettingsResource {
 
     @POST
     @Path("/values")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Updated"),
+            @ApiResponse(code = 400, message = "Invalid request or setting value")
+    })
     public void values(List<SettingValue> update) throws IOException {
+        Multimap<String, Pattern> expressions = repository.getValidationExpressions();
+        update.forEach(sv->{
+            if(expressions.containsKey(sv.getName())){
+                expressions.get(sv.getName()).forEach(p->{
+                    if(!p.matcher(sv.getValue()).matches()){
+                        throw new ValidationException("Couldn't validate "+sv.getName());
+                    }
+                });
+            }
+        });
         values.storeValues(update);
         configWriter.executeApplyGroups(
                 repository.findGroupsNeedingExecutionForChanges(update),

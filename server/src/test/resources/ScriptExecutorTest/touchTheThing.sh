@@ -15,5 +15,4 @@
 #    limitations under the License.
 #
 
-ifconfig up {{{wlanInterface}}}
-service dhcpd start
+touch theThing

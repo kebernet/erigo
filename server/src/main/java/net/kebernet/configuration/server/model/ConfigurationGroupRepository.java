@@ -15,6 +15,8 @@
  */
 package net.kebernet.configuration.server.model;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import net.kebernet.configuration.client.impl.GsonFactory;
 import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.SettingValue;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +47,7 @@ public class ConfigurationGroupRepository {
     private final File storageDirectory;
     private final ArrayList<ConfigurationGroup> groups = new ArrayList<>();
     private long previousNewestTimestamp = Long.MIN_VALUE;
+    private final Multimap<String, Pattern> validationExpressions = ArrayListMultimap.create();
 
     @Inject
     public ConfigurationGroupRepository(@Named("storageDirectory") File storageDirectory) {
@@ -81,6 +85,7 @@ public class ConfigurationGroupRepository {
             return false;
         }
         groups.clear();
+        validationExpressions.clear();
         File configs = new File(storageDirectory, "configs");
         if (configs.exists()) {
             if (!configs.getParentFile().mkdirs() || !configs.mkdir()) {
@@ -93,6 +98,10 @@ public class ConfigurationGroupRepository {
             groups.add(loadRoot(f));
         }
         groups.sort(Comparator.comparingInt(o -> o.getSettingsGroup().getIndex()));
+        groups.stream().map(g->g.getSettingsGroup().getSettings())
+                .flatMap(List::stream)
+                .forEach(s ->validationExpressions.put(s.getId(), Pattern.compile(s.getValidationExpression())));
+
         return true;
     }
 
@@ -128,4 +137,7 @@ public class ConfigurationGroupRepository {
     }
 
 
+    public Multimap<String,Pattern> getValidationExpressions() {
+        return validationExpressions;
+    }
 }

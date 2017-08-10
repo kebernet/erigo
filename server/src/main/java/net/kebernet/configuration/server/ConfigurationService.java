@@ -26,6 +26,7 @@ import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import net.kebernet.configuration.server.endpoint.DeviceResource;
 import net.kebernet.configuration.server.endpoint.SettingsResource;
+import net.kebernet.configuration.server.endpoint.ValidationExceptionMapper;
 import net.kebernet.configuration.server.http.CorsFilter;
 import net.kebernet.configuration.server.http.GsonJerseyProvider;
 import net.kebernet.configuration.server.http.PamFilter;
@@ -100,6 +101,7 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
         graph.get(MulticastDNSService.class).start();
         environment.jersey().register(GsonJerseyProvider.class);
         environment.jersey().register(new ApiListingResource());
+        environment.jersey().register(ValidationExceptionMapper.class);
         environment.jersey().register(graph.get(DeviceResource.class));
         environment.jersey().register(graph.get(SettingsResource.class));
 

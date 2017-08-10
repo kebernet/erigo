@@ -13,26 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package net.kebernet.configuration.server;
+package net.kebernet.configuration.server.endpoint;
 
-/**
- * Created by rcooper on 6/13/17.
- */
-public class WifiSwitcher {
+import javax.validation.ValidationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
-    private final WifiConfigWriter writer;
 
-    public WifiSwitcher(WifiConfigWriter writer) {
-        this.writer = writer;
+@Provider
+public class ValidationExceptionMapper implements ExceptionMapper<ValidationException> {
+    @Override
+    public Response toResponse(ValidationException ex) {
+        return Response.status(400).entity(ex.getMessage()).type("text/plain")
+                .build();
     }
-
-
-    public void runAdHocNetwork() {
-
-    }
-
-    public void runWifiNetwork() {
-
-    }
-
 }
+

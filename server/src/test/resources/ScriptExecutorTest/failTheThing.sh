@@ -15,5 +15,6 @@
 #    limitations under the License.
 #
 
-ifconfig up {{{wlanInterface}}}
-service dhcpd start
+
+echo "Epic"
+exit -1

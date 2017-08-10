@@ -86,6 +86,9 @@ public class SettingValueRepository {
                 properties.setProperty(v.getName(), v.getValue());
             }
         });
+        if(!settingsFile.exists() && !settingsFile.createNewFile()){
+            throw new IOException("Failed to create "+settingsFile.getAbsolutePath());
+        }
         try(Writer w = new OutputStreamWriter(new FileOutputStream(settingsFile), Charsets.UTF_8)) {
             properties.store(w, "Device settings");
         }

@@ -1,4 +1,4 @@
-/**
+/*
  *     Copyright (c) 2017 Robert Cooper
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-{
-  "index": 0,
-  "name": "Wi-Fi Settings",
-  "description" : "Connect your doo dad to the network.",
-  "settings" : [
-    {
-      "id": "wifi_ssid",
-      "name" : "Wi-Fi Network Name",
-      "type": "text",
-      "validationExpression" : "[^\n\r]*"
-    },
-    {
-      "id": "wifi_password",
-      "name" : "Wi-Fi Password",
-      "type": "password",
-      "validationExpression" : "[^\n\r]*"
+package net.kebernet.configuration.server;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+/**
+ * Created by rcooper on 6/13/17.
+ */
+@Singleton
+public class WifiMonitor {
+
+    private final WifiConfigWriter writer;
+
+    @Inject
+    public WifiMonitor(WifiConfigWriter writer) {
+        this.writer = writer;
     }
-  ]
+
+
+    public void runAdHocNetwork() {
+
+    }
+
+    public void runWifiNetwork() {
+
+    }
+
 }

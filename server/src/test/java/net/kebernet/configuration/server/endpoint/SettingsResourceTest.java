@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server.endpoint;
 
+import com.google.common.collect.ArrayListMultimap;
 import net.kebernet.configuration.client.model.Group;
 import net.kebernet.configuration.client.model.SettingValue;
 import net.kebernet.configuration.client.model.Settings;
@@ -55,6 +56,8 @@ public class SettingsResourceTest {
 
         when(groupRepository.findGroupsNeedingExecutionForChanges(any(List.class)))
                 .thenReturn(groupList);
+        when(groupRepository.getValidationExpressions())
+                .thenReturn(ArrayListMultimap.create());
 
         SettingValue value = new SettingValue("name", "value");
         SettingValue value2 = new SettingValue("name2", "value2");
