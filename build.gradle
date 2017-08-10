@@ -119,6 +119,11 @@ configure(subprojects - project(':android')) {
             html.enabled true
         }
     }
+    test {
+        testLogging {
+            exceptionFormat = 'full'
+        }
+    }
 }
 
 allprojects {
