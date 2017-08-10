@@ -21,7 +21,7 @@ allprojects{
     apply plugin: 'nebula.maven-publish'
     apply plugin: 'maven'
     group 'net.kebernet.configuration'
-    version '1.0-SNAPSHOT'
+    version '0.1'
     buildscript {
         repositories {
             mavenCentral()
@@ -35,6 +35,9 @@ allprojects{
             }
             maven {
                 url "https://oss.sonatype.org/content/repositories/snapshots/"
+            }
+            maven {
+                url  "https://dl.bintray.com/gesellix/gradle-plugins/"
             }
         }
     }

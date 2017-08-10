@@ -2,12 +2,15 @@ buildscript {
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath "net.ltgt.gradle:gradle-apt-plugin:0.10"
+//        classpath "de.gesellix:gradle-debian-plugin:16"
+        classpath  group: 'com.netflix.nebula', name: 'gradle-ospackage-plugin', version: '4.4.0'
     }
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "net.ltgt.apt"
-
+apply plugin: 'nebula.ospackage'
+apply plugin: 'application'
 
 repositories {
     mavenCentral()
@@ -53,4 +56,55 @@ shadowJar {
     classifier = "all"
 }
 
-tasks.build.dependsOn shadowJar
+distributions {
+    main {
+        baseName = "erigo-server"
+        applicationName = 'erigo-server'
+        mainClassName = "net.kebernet.configuration.server.ConfigurationService"
+        contents {
+
+        }
+    }
+}
+
+ospackage {
+    packageName = 'erigo-server'
+    version =  project.version
+    release = '1'
+    os = LINUX
+
+    //installUtils file('scripts/rpm/utils.sh')
+//    preInstall file('scripts/rpm/preInstall.sh')
+//    postInstall file('scripts/rpm/postInstall.sh')
+    preUninstall 'rm -rf /opt/erigo-server'
+//    postUninstall file('scripts/rpm/postUninstall.sh')
+
+    into '/opt/erigo-server'
+
+    from(file("build/libs/")) {
+        include "*-all.jar"
+        into 'lib'
+    }
+
+    from(file("src/bash")) {
+        into 'bin'
+        fileMode = 0550
+    }
+
+
+}
+//
+//buildRpm {
+//    requires('bar', '2.2', GREATER | EQUAL)
+//    requires('baz', '1.0.1', LESS)
+//    link('/etc/init.d/foo’, '/opt/foo/bin/foo.init')
+//}
+//
+buildDeb() {
+    requires('dhcp3-server')
+    requires('oracle-java8-jdk')
+    link('/etc/init.d/erigo-server', '/opt/ergo-server/bin/erigo-server-init')
+}
+tasks.buildDeb.dependsOn(shadowJar)
+tasks.build.dependsOn buildDeb
+

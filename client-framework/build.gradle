@@ -104,18 +104,20 @@ task copySources(dependsOn: extractJ2o) {
     }
 
 }
-if(  local["j2objc.home"] != null){
-    task j2objc(dependsOn: copySources) {
-        doFirst {
-            println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
-        }
-        doLast {
-            exec {
-                executable local["j2objc.home"] + '/j2objc'
-                args listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
-            }
-        }
-    }
+//Commented. I need to figure out javax.xml.bind.annotation.XmlTransient;
 
-    build.dependsOn j2objc
-}
+//if( local["j2objc.home"] != null){
+//    task j2objc(dependsOn: copySources) {
+//        doFirst {
+//            println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
+//        }
+//        doLast {
+//            exec {
+//                executable local["j2objc.home"] + '/j2objc'
+//                args listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
+//            }
+//        }
+//    }
+//
+//    build.dependsOn j2objc
+//}

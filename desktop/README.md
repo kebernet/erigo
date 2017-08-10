@@ -14,6 +14,7 @@ gradlew build will spit out all the relevant artifacts. You will find them in th
 These include:
 
  1. Erigo-universal-{version}.zip -- A universal installation you can use on 
-   pretty much anything that supports Java. You will need the librxtx installed.
+   pretty much anything that supports Java. You will need the librxtx installed
+   if you wish to use with Arduino.
  1. Erigo-Mac-{version}.zip -- A MacOS X app.
    
