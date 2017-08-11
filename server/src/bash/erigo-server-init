@@ -19,12 +19,12 @@
 DAEMON_NAME="erigo-server"
 DAEMON_USER="root"
 DAEMON_PATH="/opt/erigo-server/erigo-server"
-DAEMON_OPTS="-c /etc/generic-prog.conf"
+DAEMON_OPTS=""
 DAEMON_PWD="/opt/erigo-server"
 DAEMON_DESC=$(get_lsb_header_val $0 "Short-Description")
 DAEMON_PID="/var/run/${DAEMON_NAME}.pid"
 DAEMON_NICE=0
-DAEMON_LOG='/var/log/erigo-server'
+DAEMON_LOG='/var/log/erigo-server/stdout.log'
 
 [ -r "/etc/default/${DAEMON_NAME}" ] && . "/etc/default/${DAEMON_NAME}"
 

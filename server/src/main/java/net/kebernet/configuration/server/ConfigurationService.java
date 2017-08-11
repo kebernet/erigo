@@ -34,6 +34,7 @@ import net.kebernet.configuration.server.http.RequireSslFilter;
 
 import javax.servlet.DispatcherType;
 import java.io.File;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.logging.Logger;
 
@@ -52,10 +53,15 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
 
     public static void main(String[] args) throws Exception {
         StartupParameters parameters = new StartupParameters();
-        JCommander.newBuilder()
+        JCommander commander = JCommander.newBuilder()
                 .addObject(parameters)
-                .build()
-                .parse(args);
+                .build();
+        commander.setProgramName("erigo-server");
+        commander.parse(args);
+        if(parameters.isHelp()){
+            commander.usage();
+            return;
+        }
         startup(parameters);
     }
 

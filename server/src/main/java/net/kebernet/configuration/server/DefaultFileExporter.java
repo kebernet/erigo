@@ -83,7 +83,7 @@ public class DefaultFileExporter {
                     ip.append(Integer.toString(b & 0xFF));
                 }
             } catch (UnknownHostException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.INFO, "Couldn't get IP for local interface.", e);
             }
 
             List<String> command = Arrays.asList(

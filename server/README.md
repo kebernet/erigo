@@ -11,7 +11,8 @@ Build
 will be in ```build/distributions```. This will include:
 
  * erigo-server-{version}-all.deb : A Debian package suitable for a Raspberry Pi.
- * erigo-server-{version}
+ * erigo-server-{version}.zip: A zip file containing the server app packaged as a zip. It is kind
+   of on you do deal with setting it up in your environment.
 
 
 Install
@@ -23,6 +24,48 @@ Install
 Configure
 ---------
 
+There are a a number of command line options you can configure. If you are installing Erigo as a
+service on your machine, you can look at configuring the ```DAEMON_OPTS``` in the 
+```erigo-server-init``` script, or pass them on the command line:
+
+```
+$ bin/erigo-server --help
+
+Usage: erigo-server [options]
+  Options:
+    -c, --c-subnet
+      The class C subnet below 192.168.X.* that it will create for ad-hoc 
+      networking. 
+      Default: 1
+    -d, --device-type
+      The name of the device. Will be postfixed with the last two characters 
+      of the MAC address.
+      Default: RaspberryPi
+    --dont-require-login
+      Prevents the HTTP service from requiring a login.
+      Default: false
+    --dont-require-ssl
+      Prevents the exposed URIs from redirecting to HTTPS.
+      Default: false
+    --help
+      Displays the help text.
+    -i, --interface
+      The wifi interface to manage
+      Default: wlan0
+    -m, --mode
+      Toggle for the Dropwizard configuration.
+      Default: server
+    --network-client-matcher
+      A Regular expression to match network addresses that should beallowed to 
+      talk to the service.
+    -s, --settings-directory
+      The directory to store values to relative to the target directory
+      Default: etc/erigo
+    -t, --target-directory
+      The root target directory to write configuration files to.
+      Default: /
+
+```
 
 
 

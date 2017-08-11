@@ -24,28 +24,28 @@ import com.beust.jcommander.Parameter;
 public class StartupParameters {
 
     @Parameter(names = {"-d", "--device-type"}, description = "The name of the device. Will be postfixed with the last " +
-            "two characters of the MAC address. (RaspberryPi)")
+            "two characters of the MAC address.")
     private String deviceType = "RaspberryPi";
 
     @Parameter(names = {"-c", "--c-subnet"}, description = "The class C subnet below 192.168.X.* that it will create for " +
-            "ad-hoc networking. (1)")
+            "ad-hoc networking.")
     private int cSubnet = 1;
 
-    @Parameter(names = {"-d", "--target-directory"}, description = "The root target directory to write configuration files to. (/)")
+    @Parameter(names = {"-t", "--target-directory"}, description = "The root target directory to write configuration files to.")
     private String targetDirectory = "/";
 
-    @Parameter(names = {"-s", "--settings-directory"}, description = "The directory to store values to relative to the target directory (/etc/erigo)")
+    @Parameter(names = {"-s", "--settings-directory"}, description = "The directory to store values to relative to the target directory")
     private String storageDirectory = "etc/erigo";
 
 
-    @Parameter(names = {"-i", "--interface"}, description = "The wifi interface to manage (wlan0)")
+    @Parameter(names = {"-i", "--interface"}, description = "The wifi interface to manage")
     private String wlanInterface = "wlan0";
 
-    @Parameter(names = "-m", description = "Toggle for the dropwizard configuration. (server)")
+    @Parameter(names = {"-m", "--mode"}, description = "Toggle for the Dropwizard configuration.")
     private String mode = "server";
 
-    @Parameter(names ="--network-match", description = "A Regular expression to match network addresses that should be" +
-            "allowed to talk to the service")
+    @Parameter(names ="--network-client-matcher", description = "A Regular expression to match network addresses that should be" +
+            "allowed to talk to the service.")
     private String hostMatchRegex;
 
     @Parameter(names = "--dont-require-login", description = "Prevents the HTTP service from requiring a login.")
@@ -53,6 +53,9 @@ public class StartupParameters {
 
     @Parameter(names = "--dont-require-ssl", description = "Prevents the exposed URIs from redirecting to HTTPS.")
     private boolean dontRequireSsl = false;
+
+    @Parameter(names = "--help", help = true, description = "Displays the help text.")
+    private boolean help;
 
     public String getDeviceType() {
         return deviceType;
@@ -124,5 +127,9 @@ public class StartupParameters {
 
     public void setDontRequireSsl(boolean dontRequireSsl) {
         this.dontRequireSsl = dontRequireSsl;
+    }
+
+    public boolean isHelp(){
+        return this.help;
     }
 }
