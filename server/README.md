@@ -38,7 +38,7 @@ Usage: erigo-server [options]
       networking. 
       Default: 1
     -d, --device-type
-      The name of the device. Will be postfixed with the last two characters 
+      The name of the device. Will be postfixed with the last few characters 
       of the MAC address.
       Default: RaspberryPi
     --dont-require-login
@@ -117,7 +117,7 @@ pick up the changes.
 Finally, we need to create ```/etc/erigo/configs/group.json```. This will define what the
 user sees in the application UI:
 
-```$json
+```$javascript
 {
   "index": 10,                                                 // A priority value to for UI order
   "name": "Apache Settings",                                   // The name of the group

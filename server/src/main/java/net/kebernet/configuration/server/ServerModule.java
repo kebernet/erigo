@@ -19,6 +19,8 @@ import dagger.Module;
 import dagger.Provides;
 import net.kebernet.configuration.server.endpoint.DeviceResource;
 import net.kebernet.configuration.server.endpoint.SettingsResource;
+import net.kebernet.configuration.server.system.ScriptsInspector;
+import net.kebernet.configuration.server.system.SystemInspector;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -77,5 +79,11 @@ public class ServerModule {
     @Named("defaultDeviceName")
     public String defaultDeviceName(){
         return WifiConfigWriter.computeDefaultName(parameters);
+    }
+
+    @Provides
+    @Singleton
+    public SystemInspector systemInspector(@Named("storageDirectory") File storageDir){
+        return new ScriptsInspector(storageDir, parameters);
     }
 }

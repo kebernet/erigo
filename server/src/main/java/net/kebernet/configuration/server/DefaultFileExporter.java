@@ -63,6 +63,7 @@ public class DefaultFileExporter {
         writeMissingFiles("/adhoc");
         writeMissingFiles("/wifi");
         writeMissingFiles("/configs");
+        writeMissingFiles("/scripts");
         checkKeystoreGeneration();
     }
 
