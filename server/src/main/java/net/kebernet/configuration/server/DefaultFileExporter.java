@@ -64,6 +64,7 @@ public class DefaultFileExporter {
         writeMissingFiles("/wifi");
         writeMissingFiles("/configs");
         writeMissingFiles("/scripts");
+        writeMissingFiles("/bin");
         checkKeystoreGeneration();
     }
 

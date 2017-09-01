@@ -15,21 +15,31 @@
 #    limitations under the License.
 #
 
+#
+# Returns 0 for true, -1 for false
+#
 
 INTERFACE=$1
 
 doDarwin() {
-    exit 0;
+    ACTIVE=`/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep "op mode: IBSS" | wc -l | tr -d '[:space:]'`
+    if [ "$ACTIVE" == "1" ]; then
+        echo "${INTERFACE} YES"
+        exit 0
+    else
+        echo "${INTERFACE} NO"
+        exit -1;
+    fi
 }
 
 doLinux() {
     EXPRESSION="/iface $INTERFACE .*/,/wireless-mode .*/!d"
     ACTIVE=`cat /etc/network/interfaces | sed "${EXPRESSION}" | grep 'wireless-mode ad-hoc' | wc -l | tr -d '[:space:]'`
     if [ "$ACTIVE" == "1" ]; then
-        echo "${INTERFACE} UP"
+        echo "${INTERFACE} YES"
         exit 0
     else
-        echo "${INTERFACE} DOWN"
+        echo "${INTERFACE} NO"
         exit -1;
     fi
 }

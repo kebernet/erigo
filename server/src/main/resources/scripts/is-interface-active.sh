@@ -15,6 +15,10 @@
 #    limitations under the License.
 #
 
+#
+# Returns 0 for true, -1 for false
+#
+
 
 INTERFACE=$1
 

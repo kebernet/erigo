@@ -15,5 +15,34 @@
 #    limitations under the License.
 #
 
-ifconfig up {{{wlanInterface}}}
-service dhcpd start
+doDarwin() {
+    {{{erigo.storageDirectory}}}/bin/darwin/adhocnet {{{networkName}}} {{{networkName}}}
+}
+
+doLinux() {
+    ifconfig up {{{wlanInterface}}}
+    service dhcpd start
+}
+
+doCygwin() {
+    exit 0
+}
+
+doMINGW(){
+    exit 0
+}
+
+case "`uname`" in
+  CYGWIN* )
+    doCygwin
+    ;;
+  Darwin* )
+    doDarwin
+    ;;
+  MINGW* )
+    doMINGW
+    ;;
+  Linux* )
+    doLinux
+    ;;
+esac

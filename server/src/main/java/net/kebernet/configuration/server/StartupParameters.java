@@ -57,6 +57,9 @@ public class StartupParameters {
     @Parameter(names = "--help", help = true, description = "Displays the help text.")
     private boolean help;
 
+    @Parameter(names = "--groovy-shell-enabled", description = "Toggles the localhost Groovy shell listener.")
+    private boolean groovyShellEnabled = true;
+
     public String getDeviceType() {
         return deviceType;
     }

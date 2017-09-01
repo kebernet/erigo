@@ -1,5 +1,5 @@
 
-   Copyright 2017 Robert Cooper and the Erigo Team.
+               Copyright 2017 Robert Cooper and the Erigo Team.
 
                                Apache License
                            Version 2.0, January 2004

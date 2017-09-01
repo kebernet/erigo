@@ -80,15 +80,15 @@ public class WifiConfigWriterTest {
         assertTrue(before.exists());
         try(InputStreamReader r = new InputStreamReader(new FileInputStream(before), Charsets.UTF_8)){
             List<String> read = CharStreams.readLines(r);
-            assertTrue(read.contains("ifconfig down wlan0"));
+            assertTrue(read.contains("    ifconfig down wlan0"));
         }
 
         File after = new File(dir, "adhoc-after");
         assertTrue(after.exists());
         try(InputStreamReader r = new InputStreamReader(new FileInputStream(after), Charsets.UTF_8)){
             List<String> read = CharStreams.readLines(r);
-            assertTrue(read.contains("ifconfig up wlan0"));
-            assertTrue(read.contains("service dhcpd start"));
+            assertTrue(read.contains("    ifconfig up wlan0"));
+            assertTrue(read.contains("    service dhcpd start"));
         }
     }
 

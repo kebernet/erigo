@@ -135,3 +135,9 @@ user sees in the application UI:
 
 Now restart the Ergio service, and you will see your new "Apache Settings" pannel in the configuration for
 your device.
+
+
+Other
+-----
+
+This project includes a binary for [adhocnet](https://github.com/hildjj/adhocnet) for working on Mac OS.

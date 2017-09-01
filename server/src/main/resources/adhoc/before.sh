@@ -15,4 +15,35 @@
 #    limitations under the License.
 #
 
-ifconfig down {{{wlanInterface}}}
+
+
+doDarwin() {
+   exit 0
+}
+
+doLinux() {
+    ifconfig down {{{wlanInterface}}}
+}
+
+doCygwin() {
+    exit 0
+}
+
+doMINGW(){
+    exit 0
+}
+
+case "`uname`" in
+  CYGWIN* )
+    doCygwin
+    ;;
+  Darwin* )
+    doDarwin
+    ;;
+  MINGW* )
+    doMINGW
+    ;;
+  Linux* )
+    doLinux
+    ;;
+esac
