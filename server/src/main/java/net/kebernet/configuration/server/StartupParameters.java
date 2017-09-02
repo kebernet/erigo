@@ -58,7 +58,7 @@ public class StartupParameters {
     private boolean help;
 
     @Parameter(names = "--groovy-shell-enabled", description = "Toggles the localhost Groovy shell listener.")
-    private boolean groovyShellEnabled = true;
+    private boolean groovyShellEnabled = false;
 
     public String getDeviceType() {
         return deviceType;
@@ -134,5 +134,13 @@ public class StartupParameters {
 
     public boolean isHelp(){
         return this.help;
+    }
+
+    public boolean isGroovyShellEnabled() {
+        return groovyShellEnabled;
+    }
+
+    public void setGroovyShellEnabled(boolean groovyShellEnabled) {
+        this.groovyShellEnabled = groovyShellEnabled;
     }
 }

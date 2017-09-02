@@ -16,8 +16,10 @@
 package net.kebernet.configuration.server;
 
 import net.kebernet.configuration.client.model.SettingValue;
+import org.eclipse.jetty.util.annotation.Name;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
@@ -34,13 +36,13 @@ import java.util.logging.Level;
 public class WifiConfigWriter extends ConfigWriter {
 
     @Inject
-    public WifiConfigWriter(StartupParameters startupParameters, ScriptExecutor executor) {
-        super(new File(startupParameters.getTargetDirectory()), new File(startupParameters.getStorageDirectory()), executor);
-        renderContext.put("deviceName", startupParameters.getDeviceType());
-        renderContext.put("wlanInterface", startupParameters.getWlanInterface());
-        renderContext.put("cSubnet", startupParameters.getCSubnet());
-        renderContext.put("deviceType", startupParameters.getDeviceType());
-        String networkName = computeDefaultName(startupParameters)+".erigo";
+    public WifiConfigWriter(@Named("targetDirectory") File targetDirectory, @Named("storageDirectory") File storageDirectory, StartupParameters parameters, ScriptExecutor executor) {
+        super(targetDirectory, storageDirectory, executor);
+        renderContext.put("deviceName", parameters.getDeviceType());
+        renderContext.put("wlanInterface", parameters.getWlanInterface());
+        renderContext.put("cSubnet", parameters.getCSubnet());
+        renderContext.put("deviceType", parameters.getDeviceType());
+        String networkName = computeDefaultName(parameters)+".erigo";
         renderContext.put( "networkName", networkName);
     }
 

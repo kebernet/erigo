@@ -24,6 +24,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.listing.ApiListingResource;
+import net.kebernet.configuration.server.console.ShellServer;
 import net.kebernet.configuration.server.endpoint.DeviceResource;
 import net.kebernet.configuration.server.endpoint.SettingsResource;
 import net.kebernet.configuration.server.endpoint.ValidationExceptionMapper;
@@ -31,11 +32,13 @@ import net.kebernet.configuration.server.http.CorsFilter;
 import net.kebernet.configuration.server.http.GsonJerseyProvider;
 import net.kebernet.configuration.server.http.PamFilter;
 import net.kebernet.configuration.server.http.RequireSslFilter;
+import net.kebernet.configuration.server.system.SystemInspector;
 
 import javax.servlet.DispatcherType;
 import java.io.File;
-import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -82,7 +85,6 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
                 parameters.getMode(),
                 Resources.getResource("server.yml").getPath()
         );
-
     }
 
     @Override
@@ -103,13 +105,26 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
             environment.servlets().addFilter("PAMAuthenticationFilter", new PamFilter())
                     .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
         }
-
-        graph.get(MulticastDNSService.class).start();
+        MulticastDNSService mdns = graph.get(MulticastDNSService.class);
+        mdns.start();
         environment.jersey().register(GsonJerseyProvider.class);
         environment.jersey().register(new ApiListingResource());
         environment.jersey().register(ValidationExceptionMapper.class);
         environment.jersey().register(graph.get(DeviceResource.class));
         environment.jersey().register(graph.get(SettingsResource.class));
+
+        if(parameters.isGroovyShellEnabled()){
+            LOGGER.info("Starting Groovy Shell on port 13190");
+            ShellServer shell = new ShellServer(13130);
+            Map<String, Object> bindings = new HashMap<>();
+            bindings.put(WifiConfigWriter.class.getSimpleName(), graph.get(WifiConfigWriter.class));
+            bindings.put(MulticastDNSService.class.getSimpleName(), mdns);
+            bindings.put(SystemInspector.class.getSimpleName(), graph.get(SystemInspector.class));
+            bindings.put(ShellServer.class.getSimpleName(), shell);
+            shell.setBindings(bindings);
+
+            shell.start();
+        }
 
 
         BeanConfig config = new BeanConfig();

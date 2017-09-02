@@ -26,11 +26,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class ConfigurationServiceTest {
 
-    @Test   @Ignore
+    @Test  @Ignore
     public void testServer() throws Exception {
         File targetDir = new File(System.getProperty("build.dir")+"/test", ConfigurationServiceTest.class.getSimpleName());
         StartupParameters parameters = new StartupParameters();
+        parameters.setWlanInterface("en0");
+        parameters.setGroovyShellEnabled(true);
         parameters.setTargetDirectory(targetDir.getAbsolutePath());
+        parameters.setStorageDirectory(new File(targetDir, "etc").getAbsolutePath());
         ConfigurationService.startup(parameters);
         Thread.sleep(TimeUnit.MINUTES.toMillis(20));
     }

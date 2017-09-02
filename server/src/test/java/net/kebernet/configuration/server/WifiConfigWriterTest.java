@@ -58,7 +58,7 @@ public class WifiConfigWriterTest {
         params.setTargetDirectory(dir.getAbsolutePath());
         ScriptExecutor executor = mock(ScriptExecutor.class);
         doNothing().when(executor).runAndDeleteScript(anyString());
-        WifiConfigWriter writer = new WifiConfigWriter(params, executor);
+        WifiConfigWriter writer = new WifiConfigWriter(dir, etc, params, executor);
         writer.writeAdHocNetworkConfig();
 
         File interfaces = new File(dir, "etc/network/interfaces");
@@ -112,7 +112,7 @@ public class WifiConfigWriterTest {
         params.setTargetDirectory(dir.getAbsolutePath());
         ScriptExecutor executor = mock(ScriptExecutor.class);
         doNothing().when(executor).runAndDeleteScript(anyString());
-        WifiConfigWriter writer = new WifiConfigWriter(params, executor);
+        WifiConfigWriter writer = new WifiConfigWriter(dir, etc, params, executor);
         List<SettingValue> values = Arrays.asList(new SettingValue("wifi_ssid", "TheSSSID"),
                 new SettingValue("wifi_password", "ThePassword"));
 

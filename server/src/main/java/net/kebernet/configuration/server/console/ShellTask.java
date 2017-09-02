@@ -16,22 +16,19 @@
 package net.kebernet.configuration.server.console;
 
 
+import com.google.common.base.Charsets;
 import groovy.lang.Binding;
 import groovy.lang.Closure;
-
 import org.codehaus.groovy.tools.shell.Command;
 import org.codehaus.groovy.tools.shell.ExitNotification;
 import org.codehaus.groovy.tools.shell.Groovysh;
 import org.codehaus.groovy.tools.shell.IO;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-
 import java.net.Socket;
-
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,25 +45,23 @@ public class ShellTask implements Runnable {
     private final List<String> defaultScripts;
     private final Socket socket;
 
-    public ShellTask(Socket socket, Binding binding, List<String> defaultScripts) {
+    ShellTask(Socket socket, Binding binding, List<String> defaultScripts) {
         this.socket = socket;
         this.binding = binding;
         this.defaultScripts = defaultScripts;
     }
 
-    public void closeSocket() {
+    void closeSocket() {
         closeQuietly(socket);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "serial"})
     public void run() {
-        PrintStream out = null;
-        InputStream in = null;
-
-        try {
-            out = new PrintStream(socket.getOutputStream());
-            in = socket.getInputStream();
+        try (
+                PrintStream out = new PrintStream(socket.getOutputStream(), true, Charsets.UTF_8.name());
+                InputStream in = socket.getInputStream()
+        ) {
 
             binding.setVariable("out", out);
 
@@ -104,24 +99,17 @@ public class ShellTask implements Runnable {
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Error while executing client command", e);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOG.log(Level.SEVERE, "Exception in groovy shell client thread", e);
         } finally {
-            closeQuietly(in);
-            closeQuietly(out);
             closeQuietly(socket);
         }
     }
 
-    private static void closeQuietly(Closeable object) {
-        try {
-            object.close();
-        } catch (IOException e) {
-            LOG.log(Level.WARNING, "Error while closing object", e);
-        }
-    }
-
     private static void closeQuietly(Socket socket) {
+        if(socket == null){
+            return;
+        }
         try {
             socket.close();
         } catch (IOException e) {
@@ -147,7 +135,7 @@ public class ShellTask implements Runnable {
                         .find("load");
 
                 for (String script : defaultScripts) {
-                    cmd.execute(Arrays.asList(script));
+                    cmd.execute(Collections.singletonList(script));
                 }
             } finally {
                 // Restoring original result hook

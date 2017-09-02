@@ -15,6 +15,7 @@
  */
 package net.kebernet.configuration.server.system;
 
+import net.kebernet.configuration.server.ScriptExecutor;
 import net.kebernet.configuration.server.StartupParameters;
 
 import javax.inject.Inject;
@@ -25,22 +26,36 @@ import java.io.File;
 @Singleton
 public class ScriptsInspector implements SystemInspector {
 
-    private final File storageDirectory;
+    private final ScriptExecutor executor;
+    private final File adHocModeScript;
+    private final File interfaceActiveScript;
     private final StartupParameters parameters;
 
     @Inject
-    public ScriptsInspector(@Named("storageDirectory") File storageDirectory, StartupParameters parameters) {
-        this.storageDirectory = storageDirectory;
+    public ScriptsInspector(@Named("storageDirectory") File storageDirectory, ScriptExecutor executor, StartupParameters parameters) {
+        File scriptsDirectory = new File(storageDirectory, "scripts");
+        this.adHocModeScript = new File(scriptsDirectory, "is-adhoc-mode.sh");
+        this.interfaceActiveScript = new File(scriptsDirectory, "is-interface-active.sh");
+        this.executor = executor;
         this.parameters = parameters;
     }
 
     @Override
     public synchronized boolean isWifiActive() {
-        return false;
+        return isReturnCodeZero(interfaceActiveScript.getAbsolutePath());
     }
 
     @Override
     public synchronized boolean isAdHocMode() {
-        return false;
+        return isReturnCodeZero(adHocModeScript.getAbsolutePath());
+    }
+
+    private boolean isReturnCodeZero(String path){
+        try {
+            executor.runScript(path, parameters.getWlanInterface());
+            return true;
+        } catch(ScriptExecutor.ScriptException se){
+            return false;
+        }
     }
 }

@@ -31,6 +31,8 @@ dependencies {
     compile 'io.dropwizard:dropwizard-assets:1.0.2'
     compile 'com.squareup.dagger:dagger:1.2.5'
     compile 'org.codehaus.groovy:groovy-all:1.+'
+    compile 'org.fusesource.jansi:jansi:1.+'
+    compile 'jline:jline:1.+'
     apt 'com.squareup.dagger:dagger-compiler:1.2.5'
 }
 

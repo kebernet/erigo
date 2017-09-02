@@ -36,7 +36,9 @@ import java.io.File;
                 DefaultFileExporter.class,
                 DeviceResource.class,
                 SettingsResource.class,
-                MulticastDNSService.class
+                MulticastDNSService.class,
+                WifiConfigWriter.class,
+                SystemInspector.class
         }, library =  true
 )
 public class ServerModule {
@@ -83,7 +85,7 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public SystemInspector systemInspector(@Named("storageDirectory") File storageDir){
-        return new ScriptsInspector(storageDir, parameters);
+    public SystemInspector systemInspector(@Named("storageDirectory") File storageDir, ScriptExecutor executor){
+        return new ScriptsInspector(storageDir, executor, parameters);
     }
 }
