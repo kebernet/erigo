@@ -106,7 +106,9 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
                     .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
         }
         MulticastDNSService mdns = graph.get(MulticastDNSService.class);
+        WifiMonitor wifiMonitor = graph.get(WifiMonitor.class);
         mdns.start();
+        wifiMonitor.start();
         environment.jersey().register(GsonJerseyProvider.class);
         environment.jersey().register(new ApiListingResource());
         environment.jersey().register(ValidationExceptionMapper.class);
@@ -121,6 +123,7 @@ public class ConfigurationService extends Application<DropwizardConfiguration> {
             bindings.put(MulticastDNSService.class.getSimpleName(), mdns);
             bindings.put(SystemInspector.class.getSimpleName(), graph.get(SystemInspector.class));
             bindings.put(ShellServer.class.getSimpleName(), shell);
+            bindings.put(WifiMonitor.class.getSimpleName(), wifiMonitor);
             shell.setBindings(bindings);
 
             shell.start();

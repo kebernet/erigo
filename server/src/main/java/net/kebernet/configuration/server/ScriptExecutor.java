@@ -34,19 +34,26 @@ public class ScriptExecutor {
 
     }
 
-    public void runScript(String... command){
+    public void runScript(String... command) {
+        this.runScript(true, command);
+    }
+
+    public void runScript(boolean inheritIo, String... command){
         String commandString = Joiner.on(" ").join(command);
-        LOGGER.info("Executing "+ commandString);
+        LOGGER.fine("Executing "+ commandString);
         File f = new File(command[0]);
         if (!f.setExecutable(true, true)) {
             throw new ScriptException("Couldn't make " + commandString + " executable.", null, Integer.MIN_VALUE);
         }
         try {
-            int result = new ProcessBuilder(f.getAbsolutePath())
+             ProcessBuilder pb = new ProcessBuilder(f.getAbsolutePath())
                     .command(Arrays.asList(command))
-                    .inheritIO()
-                    .directory(f.getParentFile())
-                    .start()
+                    .directory(f.getParentFile());
+
+             if(inheritIo){
+                 pb = pb.inheritIO();
+             }
+            int result = pb.start()
                     .waitFor();
             if(result != 0){
                 throw new ScriptException("Got invalid return code ("+result+") running "+commandString, null, result);

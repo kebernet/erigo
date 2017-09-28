@@ -23,5 +23,5 @@ public interface SystemInspector {
 
     boolean isWifiActive();
     boolean isAdHocMode();
-
+    boolean isDesiredNetworkVisible();
 }

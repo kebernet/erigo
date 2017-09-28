@@ -17,6 +17,7 @@ package net.kebernet.configuration.server.system;
 
 import net.kebernet.configuration.server.ScriptExecutor;
 import net.kebernet.configuration.server.StartupParameters;
+import net.kebernet.configuration.server.model.SettingValueRepository;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,13 +30,17 @@ public class ScriptsInspector implements SystemInspector {
     private final ScriptExecutor executor;
     private final File adHocModeScript;
     private final File interfaceActiveScript;
+    private final File desiredNetworkVisibleScript;
+    private final SettingValueRepository valueRepository;
     private final StartupParameters parameters;
 
     @Inject
-    public ScriptsInspector(@Named("storageDirectory") File storageDirectory, ScriptExecutor executor, StartupParameters parameters) {
+    public ScriptsInspector(@Named("storageDirectory") File storageDirectory, ScriptExecutor executor, SettingValueRepository valueRepository, StartupParameters parameters) {
+        this.valueRepository = valueRepository;
         File scriptsDirectory = new File(storageDirectory, "scripts");
         this.adHocModeScript = new File(scriptsDirectory, "is-adhoc-mode.sh");
         this.interfaceActiveScript = new File(scriptsDirectory, "is-interface-active.sh");
+        this.desiredNetworkVisibleScript = new File(scriptsDirectory, "is-desired-network-visible.sh");
         this.executor = executor;
         this.parameters = parameters;
     }
@@ -50,9 +55,14 @@ public class ScriptsInspector implements SystemInspector {
         return isReturnCodeZero(adHocModeScript.getAbsolutePath());
     }
 
+    @Override
+    public boolean isDesiredNetworkVisible() {
+        return false;
+    }
+
     private boolean isReturnCodeZero(String path){
         try {
-            executor.runScript(path, parameters.getWlanInterface());
+            executor.runScript(false, path, parameters.getWlanInterface(), valueRepository.findValue("wifi_ssid", "twdata"));
             return true;
         } catch(ScriptExecutor.ScriptException se){
             return false;

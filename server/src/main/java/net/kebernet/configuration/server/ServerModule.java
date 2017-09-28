@@ -19,12 +19,14 @@ import dagger.Module;
 import dagger.Provides;
 import net.kebernet.configuration.server.endpoint.DeviceResource;
 import net.kebernet.configuration.server.endpoint.SettingsResource;
+import net.kebernet.configuration.server.model.SettingValueRepository;
 import net.kebernet.configuration.server.system.ScriptsInspector;
 import net.kebernet.configuration.server.system.SystemInspector;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
+import java.time.Clock;
 
 /**
  * Created by rcooper on 7/17/17.
@@ -38,7 +40,8 @@ import java.io.File;
                 SettingsResource.class,
                 MulticastDNSService.class,
                 WifiConfigWriter.class,
-                SystemInspector.class
+                SystemInspector.class,
+                WifiMonitor.class
         }, library =  true
 )
 public class ServerModule {
@@ -85,7 +88,14 @@ public class ServerModule {
 
     @Provides
     @Singleton
-    public SystemInspector systemInspector(@Named("storageDirectory") File storageDir, ScriptExecutor executor){
-        return new ScriptsInspector(storageDir, executor, parameters);
+    public SystemInspector systemInspector(@Named("storageDirectory") File storageDir, SettingValueRepository valueRepository, ScriptExecutor executor){
+        return new ScriptsInspector(storageDir, executor, valueRepository, parameters);
     }
+
+    @Provides
+    @Singleton
+    public Clock clock(){
+        return Clock.systemUTC();
+    }
+
 }
