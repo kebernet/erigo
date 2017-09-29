@@ -140,20 +140,34 @@ public class Device {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Device)) return false;
+
         Device device = (Device) o;
-        return Objects.equal(address, device.address) &&
-                Objects.equal(name, device.name) &&
-                Objects.equal(type, device.type) &&
-                Objects.equal(manufacturer, device.manufacturer) &&
-                Objects.equal(thumbnailUrl, device.thumbnailUrl) &&
-                Objects.equal(settingsUrl, device.settingsUrl) &&
-                Objects.equal(settingsValuesUrl, device.settingsValuesUrl) &&
-                Objects.equal(webUiUrl, device.webUiUrl) &&
-                Objects.equal(tlsCertificateUrl, device.tlsCertificateUrl);
+
+        if (address != null ? !address.equals(device.address) : device.address != null) return false;
+        if (name != null ? !name.equals(device.name) : device.name != null) return false;
+        if (type != null ? !type.equals(device.type) : device.type != null) return false;
+        if (manufacturer != null ? !manufacturer.equals(device.manufacturer) : device.manufacturer != null)
+            return false;
+        if (thumbnailUrl != null ? !thumbnailUrl.equals(device.thumbnailUrl) : device.thumbnailUrl != null)
+            return false;
+        if (settingsUrl != null ? !settingsUrl.equals(device.settingsUrl) : device.settingsUrl != null) return false;
+        if (settingsValuesUrl != null ? !settingsValuesUrl.equals(device.settingsValuesUrl) : device.settingsValuesUrl != null)
+            return false;
+        if (webUiUrl != null ? !webUiUrl.equals(device.webUiUrl) : device.webUiUrl != null) return false;
+        return tlsCertificateUrl != null ? tlsCertificateUrl.equals(device.tlsCertificateUrl) : device.tlsCertificateUrl == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(address, name, type, manufacturer, thumbnailUrl, settingsUrl, webUiUrl, tlsCertificateUrl);
+        int result = address != null ? address.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (manufacturer != null ? manufacturer.hashCode() : 0);
+        result = 31 * result + (thumbnailUrl != null ? thumbnailUrl.hashCode() : 0);
+        result = 31 * result + (settingsUrl != null ? settingsUrl.hashCode() : 0);
+        result = 31 * result + (settingsValuesUrl != null ? settingsValuesUrl.hashCode() : 0);
+        result = 31 * result + (webUiUrl != null ? webUiUrl.hashCode() : 0);
+        result = 31 * result + (tlsCertificateUrl != null ? tlsCertificateUrl.hashCode() : 0);
+        return result;
     }
 }

@@ -74,15 +74,14 @@ public class Group {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Group)) return false;
 
         Group group = (Group) o;
 
         if (index != group.index) return false;
         if (requiresReboot != group.requiresReboot) return false;
         if (name != null ? !name.equals(group.name) : group.name != null) return false;
-        if (description != null ? !description.equals(group.description) : group.description != null)
-            return false;
+        if (description != null ? !description.equals(group.description) : group.description != null) return false;
         return settings != null ? settings.equals(group.settings) : group.settings == null;
     }
 

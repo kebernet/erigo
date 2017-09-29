@@ -34,3 +34,8 @@ gen
 /*.iws
 local.properties
 fabric.properties
+
+/ios/app/Erigo/com
+/ios/app/Erigo/net
+/ios/app/Erigo/io
+/ios/app/Erigo/javax

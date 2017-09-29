@@ -59,4 +59,27 @@ public class Setting {
     public void setType(String type) {
         this.type = type;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Setting)) return false;
+
+        Setting setting = (Setting) o;
+
+        if (id != null ? !id.equals(setting.id) : setting.id != null) return false;
+        if (name != null ? !name.equals(setting.name) : setting.name != null) return false;
+        if (validationExpression != null ? !validationExpression.equals(setting.validationExpression) : setting.validationExpression != null)
+            return false;
+        return type != null ? type.equals(setting.type) : setting.type == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (validationExpression != null ? validationExpression.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
 }

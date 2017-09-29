@@ -47,25 +47,29 @@ public class Settings {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Settings)) return false;
-        Settings settings = (Settings) o;
-        return
-                Objects.equal(description, settings.description) &&
-                Objects.equal(groups, settings.groups);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(description, groups);
-    }
-
-    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("description", description)
                 .add("groups", groups)
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Settings)) return false;
+
+        Settings settings = (Settings) o;
+
+        if (description != null ? !description.equals(settings.description) : settings.description != null)
+            return false;
+        return groups != null ? groups.equals(settings.groups) : settings.groups == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = description != null ? description.hashCode() : 0;
+        result = 31 * result + (groups != null ? groups.hashCode() : 0);
+        return result;
     }
 }
