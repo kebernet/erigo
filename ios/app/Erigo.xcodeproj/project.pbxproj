@@ -765,6 +765,7 @@
 		D2226EFF1F7ECDD70065069B /* Provider.m in Sources */ = {isa = PBXBuildFile; fileRef = D2226ED81F7ECDD70065069B /* Provider.m */; };
 		D2226F001F7ECDD70065069B /* Inject.m in Sources */ = {isa = PBXBuildFile; fileRef = D2226EDA1F7ECDD70065069B /* Inject.m */; };
 		D2226F011F7ECDD70065069B /* Scope.m in Sources */ = {isa = PBXBuildFile; fileRef = D2226EDC1F7ECDD70065069B /* Scope.m */; };
+		D26BBAD01F7EF94800774474 /* AppFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D26BBACF1F7EF94800774474 /* AppFlow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2287,6 +2288,8 @@
 		D2226EDA1F7ECDD70065069B /* Inject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Inject.m; sourceTree = "<group>"; };
 		D2226EDB1F7ECDD70065069B /* Scope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scope.h; sourceTree = "<group>"; };
 		D2226EDC1F7ECDD70065069B /* Scope.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scope.m; sourceTree = "<group>"; };
+		D26BBACE1F7EF86400774474 /* Erigo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Erigo-Bridging-Header.h"; sourceTree = "<group>"; };
+		D26BBACF1F7EF94800774474 /* AppFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFlow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2344,6 +2347,8 @@
 				D2225B671F7D93E10065069B /* Assets.xcassets */,
 				D2225B691F7D93E20065069B /* LaunchScreen.storyboard */,
 				D2225B6C1F7D93E20065069B /* Info.plist */,
+				D26BBACE1F7EF86400774474 /* Erigo-Bridging-Header.h */,
+				D26BBACF1F7EF94800774474 /* AppFlow.swift */,
 			);
 			path = Erigo;
 			sourceTree = "<group>";
@@ -5109,6 +5114,7 @@
 				D2226DB31F7ECDC70065069B /* ImmutableEntry.m in Sources */,
 				D2226CBA1F7ECDC60065069B /* ByteSource.m in Sources */,
 				D222610B1F7E9C450065069B /* JsonTreeReader.m in Sources */,
+				D26BBAD01F7EF94800774474 /* AppFlow.swift in Sources */,
 				D2226F001F7ECDD70065069B /* Inject.m in Sources */,
 				D2226E3A1F7ECDC70065069B /* ConfigurableMutableGraph.m in Sources */,
 				D2226D611F7ECDC70065069B /* ImmutableMapEntry.m in Sources */,
@@ -5272,6 +5278,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "Erigo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -5316,6 +5323,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Erigo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";
@@ -5342,6 +5350,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.kebernet.kebernet.configuration.ios.Erigo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Erigo/Erigo-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/** /Volumes/Personal/Applications/j2objc-2.0.1/frameworks/Guava.framework/Headers/** /Volumes/Personal/Applications/j2objc-2.0.1/include/ ${inherited}";
 			};
@@ -5366,6 +5375,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.kebernet.kebernet.configuration.ios.Erigo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Erigo/Erigo-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 				USER_HEADER_SEARCH_PATHS = "${SRCROOT}/** /Volumes/Personal/Applications/j2objc-2.0.1/frameworks/Guava.framework/Headers/** /Volumes/Personal/Applications/j2objc-2.0.1/include/ ${inherited}";
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";

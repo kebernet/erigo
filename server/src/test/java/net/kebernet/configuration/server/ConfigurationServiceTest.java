@@ -25,8 +25,7 @@ import java.util.concurrent.TimeUnit;
  * Created by rcooper on 7/19/17.
  */
 public class ConfigurationServiceTest {
-
-    @Test // @Ignore
+    @Test @Ignore
     public void testServer() throws Exception {
         File targetDir = new File(System.getProperty("build.dir")+"/test", ConfigurationServiceTest.class.getSimpleName());
         StartupParameters parameters = new StartupParameters();
