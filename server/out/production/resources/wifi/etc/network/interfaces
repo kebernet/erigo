@@ -1,0 +1,18 @@
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto {{{wlanInterface}}}
+allow-hotplug {{{wlanInterface}}}
+iface {{{wlanInterface}}} inet dhcp
+   wpa-scan-ssid 1
+   wpa-ap-scan 1
+   wpa-key-mgmt WPA-PSK
+   wpa-proto RSN WPA
+   wpa-pairwise CCMP TKIP
+   wpa-group CCMP TKIP
+   wpa-ssid "{{{wifi_ssid}}}"
+   wpa-psk "{{{wifi_password}}}"
+
+iface default inet dhcp

@@ -71,7 +71,8 @@ project.configurations.compile.each {
     compileDeps+=it
 }
 
-def j2oargs = ['--verbose',
+def j2oargs = [local["j2objc.home"] + '/j2objc',
+               '--verbose',
                '-sourcepath', file("build/j2oSources").getAbsolutePath(),
                '-classpath', compileDeps,
                '-d', file("build/ios").getAbsolutePath(),
@@ -101,23 +102,41 @@ task copySources(dependsOn: extractJ2o) {
             }
             into 'build/j2oSources'
         }
+        copy {
+            from('src/main/j2objc/java') {
+                include '**/*.java'
+                exclude excluded
+            }
+            into 'build/j2oSources'
+        }
     }
 
 }
 //Commented. I need to figure out javax.xml.bind.annotation.XmlTransient;
 
-//if( local["j2objc.home"] != null){
-//    task j2objc(dependsOn: copySources) {
-//        doFirst {
-//            println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
-//        }
-//        doLast {
-//            exec {
-//                executable local["j2objc.home"] + '/j2objc'
-//                args listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
-//            }
-//        }
-//    }
-//
-//    build.dependsOn j2objc
-//}
+if( local["j2objc.home"] != null){
+    task j2objc(dependsOn: copySources) {
+        doFirst {
+            println local["j2objc.home"] + '/j2objc' + ' ' + j2oargs.join(" ")
+        }
+        doLast {
+            def commandLine = listAllSources(j2oargs, file("build/j2oSources"), file("build/j2oSources"))
+            def echo = ""
+            commandLine.forEach {
+                echo += it + " "
+            }
+            def result = new ProcessBuilder()
+                    .command(commandLine)
+                    .redirectError(file("build/j2o.err"))
+                    .redirectOutput(file("build/j2o.out"))
+                    .start()
+                    .waitFor();
+            if(result != 0){
+                throw new RuntimeException("Failed to gen J2Objc "+result)
+            }
+        }
+    }
+
+    build.dependsOn j2objc
+    j2objc.dependsOn copySources
+}

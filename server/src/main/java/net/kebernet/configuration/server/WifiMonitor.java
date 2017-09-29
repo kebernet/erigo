@@ -71,7 +71,7 @@ public class WifiMonitor extends TimerTask {
             boolean wifiActive = inspector.isWifiActive();
             boolean adhocActive = inspector.isAdHocMode();
             boolean desiredNetworkVisible = inspector.isDesiredNetworkVisible();
-            LOGGER.info("Wifi State active:"+wifiActive+" adhoc:"+adhocActive+" desiredNetworkVisible:"+desiredNetworkVisible);
+            LOGGER.fine("Wifi State active:"+wifiActive+" adhoc:"+adhocActive+" desiredNetworkVisible:"+desiredNetworkVisible);
             // If the wifi isn't active.
             if (!wifiActive) {
                 // This is the first time I have seen the wifi down. Just mark the time.

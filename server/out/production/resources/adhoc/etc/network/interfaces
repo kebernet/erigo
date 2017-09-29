@@ -1,0 +1,11 @@
+auto lo
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto {{{wlanInterface}}}
+iface {{{wlanInterface}}} inet static
+  address 192.168.{{cSubnet}}.1
+  netmask 255.255.255.0
+  wireless-channel 1
+  wireless-essid '{{{networkName}}}'
+  wireless-mode ad-hoc
